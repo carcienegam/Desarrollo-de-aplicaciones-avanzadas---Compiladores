@@ -1,315 +1,328 @@
 import ply.yacc as yacc
 from lex_patito import tokens, build_lexer
 
+lexer = build_lexer()
+
 precedence = (
-    ('left', 'GTHAN', 'LTHAN', 'NOTEQ'),
+    ('left', 'GREATERTHAN', 'LESSTHAN', 'NOTEQ'),
     ('left', 'PLUS', 'MINUS'),
-    ('left', 'MULT', 'DIV'),
+    ('left', 'MULT', 'DIVIDE'),
 )
 
-# Helpers
+start = 'programa'
 
-def BinOp(op, a, b):
-    return ('binOp', op, a, b)
-
-def UnOp(op, a):
-    return ('unOp', op, a)
-
-def Assign(id, expr):
-    return ('assign', id, expr)
-
-def Print(expr):
-    return ('print', expr)
-
-def While(expr, body):
-    return ('while', expr, body)
-
-def If(expr, then_body, else_body):
-    return ('if', expr, then_body, else_body)
-
-def Block(stmts):
-    return ('block', stmts)
-
-def Id(name):
-    return ('id', name)
-
-def Cte(type, value):
-    return ('cte', type, value)
-
-def VDecl(name, type):
-    return ('vdecl', name, type)
-
-def Param(name, type):
-    return ('param', name, type)
-
-def Func(name, params, decloc, body):
-    return ('func', name, params, decloc, body)
-
-def Program(n, vdecls, fdecls, body):
-    return ('program', n, vdecls, fdecls, body)
-
-
-# Gramatica
-
-
-def p_start(p):
-    'start : programa'
-    p[0] = p[1]
-
-
-# 1. ----- PROGRAMA
-# <PROGRAMA> -> program id ; <skip_Vars> <skip_Funcs> main <BODY> end
+# ----- 1. Programa -----
 def p_programa(p):
-    'programa : PROGRAM ID SEMI skip_Vars skip_Funcs MAIN body END'
-    p[0] = Program(p[2], p[4] or [], p[5] or [], p[7])
+    '''programa : PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN'''
+    p[0] = ('programa', p[2], p[4], p[5], p[7])
 
-# <skip_V'> -> <VARS> | empty
-def p_skip_Vars(p):
-    ''' skip_Vars : vars
-                  | empty '''
-    p[0] = p[1]
-
-# <skip_F'> -> <loop_F> | empty
-def p_skip_Funcs(p):
-    ''' skip_Funcs : loop_Funcs
-                   | empty '''
-    p[0] = p[1]
-
-# <loop_F> -> <FUNCS><loop_F>
-def p_loop_Funcs(p):
-    ''' loop_Funcs : func
-                   | loop_Funcs func '''
-    p[0] = p[1] if len(p) == 2 else p[1] + [p[2]]
-
-
-# 2. ----- BODY
-# <BODY> -> { <skip_S'> }
-def p_body(p):
-    'body : LBRACE skip_s_p RBRACE'
-    p[0] = Block(p[2] or [])
-
-# <skip_S'> -> empty | <STATEMENT><skip_S'>
-def p_skip_s_p(p):
-    ''' skip_s_p : empty
-                   | skip_s_p stmt '''
-    p[0] = [] if len(p) == 2 else p[1] + [p[2]]
-
-
-# 3. ----- STATEMENT
-# <STATEMENT> -> <ASSIGN> | <CONDITION> | <CYCLE> | <F_CALL> | <PRINT>
-def p_statement(p):
-    ''' stmt : assign
-             | condition
-             | cycle
-             | f_call
-             | print '''
-    p[0] = p[1]
-
-# 4. ----- ASSIGN
-# <ASSIGN> -> id = <EXP> ;
-def p_assign(p):
-    'assign : ID ASSIGN exp SEMI'
-    p[0] = Assign(Id(p[1]), p[3])
-
-# 5. ----- EXPRESION
-# <EXPRESION> -> <EXP><E'>
-def p_expresion(p):
-    'expresion : exp e_p'
-    p[0] = p[1] if p[2] is None else BinOp(p[2][0], p[1], p[2][1])
-
-# <E'> -> > <EXP> | < <EXP> | != <EXP> | empty
-def p_e_p(p):
-    ''' e_p : GTHAN exp
-            | LTHAN exp
-            | NOTEQ exp
-            | empty '''
-    p[0] = None if len(p) == 2 else (p[1], p[2])
-
-# 7. ----- EXP
-# <EXP> -> <TERMINO><loop_SoR'>
-def p_exp(p):
-    '''exp : termino
-           | exp PLUS termino
-           | exp MINUS termino'''
-    p[0] = p[1] if len(p) == 2 else BinOp(p[2], p[1], p[3])
-
-# 8. ----- TERMINO
-# <TERMINO> -> <FACTOR><loop_MoD'>
-def p_termino(p):
-    '''termino : factor
-               | termino MULT factor
-               | termino DIV factor'''
-    p[0] = p[1] if len(p) == 2 else BinOp(p[2], p[1], p[3])
-
-# 15. ----- FACTOR
-# <FACTOR> -> ( <EXPRESION> )
-# <FACTOR> -> <skip_SoR'><skip_id'>
-# <skip_SoR'> -> + | - | empty
-# <skip_id'> -> id | <CTE>
-
-def p_factor(p):
-    'factor : LPAREN expresion RPAREN'
-    p[0] = p[2]
-
-def p_factor2(p):
-    ''' factor : skip_SoR skip_id 
-                | skip_id '''
-    p[0] = p[1] if len(p)==2 else (p[2] if p[1]=='UPLUS' else UnOp('UMINUS', p[2]))
-
-def p_skip_SoR(p):
-    ''' skip_SoR : PLUS
-                  | MINUS
-                  | empty '''
-    if len(p) == 2 and p[1] is None:
+def p_skipVars(p):
+    '''skipVars :
+                  | VARS_sect '''
+    if len(p) == 1:
         p[0] = None
-    else:
-        p[0] = 'UPLUS' if p.slice[1].type == 'PLUS' else 'UMINUS'
-
-def p_skip_id(p):
-    ''' skip_id : ID
-                 | CTE_INT
-                 | CTE_FLOAT '''
-    
-    t = p.slice[1].type
-    if t == 'ID':
-        p[0] = Id(p[1])
-    elif t == 'CTE_INT':
-        p[0] = Cte('CTE_INT', p[1])
-    else:
-        p[0] = Cte('CTE_FLOAT', p[1])
-
-# 10. ----- VARS
-# <VARS> -> var <V'><v_loop'>
-def p_vars(p):
-    '''vars : VAR v_p v_loop_p'''
-    p[0] = [p[2]] + p[3]
-
-def p_v_p(p):
-    'v_p : ID c_loop_id COLON type SEMI'
-    p[0] = VDecl([p[1]] + p[2], p[4])
-
-def p_c_loop_id(p):
-    '''c_loop_id : c_loop_id COMMA ID
-                 | empty '''
-    p[0] = [] if len(p) == 2 else p[1] + [p[3]]
-
-def p_v_loop_p(p):
-    '''v_loop_p : empty
-                 | v_loop_p v_p '''
-    p[0] = [] if len(p) == 2 else p[1] + [p[2]]
-
-# 11. ----- TYPE
-# <TYPE> -> INT | FLOAT
-def p_type(p):
-    '''type : INT
-            | FLOAT'''
-    p[0] = 'int' if p.slice[1].type=='INT' else 'float'
-
-# 9. ----- FUNCS
-# <FUNCS> -> void id ( <F’> <c_rep’> ) [ <f_V’> <Body> ] ;
-def p_func(p):
-    'func : VOID ID LPAREN f_p c_rep_p RPAREN LBRACKET f_v_p body RBRACKET SEMI'
-    name = p[2]
-    params = ([] if p[4] is None else [p[4]]) + p[5]
-    decloc = p[8] or []
-    p[0] = Func(name, params, decloc, p[9])
-
-# <F'> -> <f_c> | empty
-def p_f_p(p):
-    ''' f_p : f_c
-            | empty '''
-    p[0] = p[1]
-
-# <f_c> -> id : <TYPE>
-def p_f_c(p):
-    'f_c : ID COLON type'
-    p[0] = Param(p[1], p[3])
-
-# <c_rep'> -> , <f_c> | empty
-def p_c_rep_p(p):
-    ''' c_rep_p : empty
-                 | c_rep_p COMMA f_c '''
-    p[0] = [] if len(p) == 2 else p[1] + [p[3]]
-
-# <f_V'> -> <VARS> | empty
-def p_f_v_p(p):
-    ''' f_v_p : vars
-               | empty '''
-    p[0] = p[1]
-
-# 12. ----- Print
-# <PRINT> -> print ( <P'> <c_loop'> ) ;
-def p_print(p):
-    'print : PRINT LPAREN p_p c_loop_print RPAREN SEMI'
-    first = [] if p[3] is None else [p[3]]
-    p[0] = Print(first + p[4])
-
-# <P'> -> <EXPRESION> | cte.string
-def p_p_p(p):
-    ''' p_p : expresion
-            | CTE_STRING '''
-    if p.slice[1].type == 'CTE_STRING':
-        p[0] = Cte('CTE_STRING', p[1])
     else:
         p[0] = p[1]
 
-# <c_loop'> -> , <P'> | empty
-def p_c_loop_print(p):
-    ''' c_loop_print : empty
-                  | c_loop_print COMMA p_p '''
-    p[0] = [] if len(p) == 2 else p[1] + [p[3]]
+def p_cycleFuncs(p):
+    '''cycleFuncs :
+                   | FUNCS cycleFuncs '''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = [p[1]] + p[2]
 
-# 13. ----- CYCLE
-# <CYCLE> -> while ( <EXPRESION> ) do <BODY> ;
-def p_cycle(p):
-    'cycle : WHILE LPAREN expresion RPAREN DO body SEMI'
-    p[0] = While(p[3], p[6])
+# ----- 2. Cuerpo -----
+def p_CUERPO(p):
+    '''CUERPO : LEFTBRACE cycleEst RIGHTBRACE'''
+    p[0] = ('CUERPO', p[2])
 
-# 14. ----- CONDITION
-# <CONDITION> -> if ( <EXPRESION> ) <BODY> <C'> ;
-def p_condition(p):
-    'condition : IF LPAREN expresion RPAREN body c_p SEMI'
-    p[0] = If(p[3], p[5], p[6])
+def p_cycleEst(p):
+    '''cycleEst :
+                 | ESTATUTO cycleEst '''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = [p[1]] + p[2]
 
-# <C'> -> else <BODY> | empty
-def p_c_p(p):
-    ''' c_p : ELSE body
-             | empty '''
-    p[0] = None if len(p) == 2 else p[2]
+# ----- 3. Asigna ------
+def p_ASIGNA(p):
+    '''ASIGNA : ID ASSIGN EXPRESION SEMICOLON'''
+    p[0] = ('ASIGNA', p[1], p[3])
+
+# ----- 4. CTE -----
+def p_CTE_ent(p):
+    '''CTE : CTE_ENT'''
+    p[0] = ("cte_ent", p[1])
+
+def p_CTE_float(p):
+    '''CTE : CTE_FLOAT'''
+    p[0] = ("cte_float", p[1])
+
+# ----- 10. TIPO -----
+def p_TIPO(p):
+    '''TIPO : ENTERO
+            | FLOTANTE'''
+    if p.slice[1].type == 'ENTERO':
+        p[0] = ('entero',)
+    else:
+        p[0] = ('flotante',)
+
+# ----- 5. Funciones -----
+def p_FUNCS(p):
+    '''FUNCS : typeNull ID LEFTPAREN p_Follow RIGHTPAREN LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON'''
+    p[0] = ('FUNCS', p[1], p[2], p[4], p[7], p[8])
+
+def p_typeNull(p):
+    '''typeNull : NULA
+                 | TIPO'''
+    p[0] = p[1]
+
+def p_p_Follow(p):
+    '''p_Follow :
+                | ID COLON TIPO commaCycleFuncs '''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = [(p[1], p[3])] + p[4]
+
+def p_commaCycleFuncs(p):
+    '''commaCycleFuncs :
+                       | COMMA p_Follow '''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[2]
+
+# ----- 6. ESTATUTO -----
+def p_ESTATUTO_asigna(p):
+    '''ESTATUTO : ASIGNA'''
+    p[0] = p[1]
+
+def p_ESTATUTO_condicional(p):
+    '''ESTATUTO : CONDICION'''
+    p[0] = p[1]
+
+def p_ESTATUTO_ciclo(p):
+    '''ESTATUTO : CICLO'''
+    p[0] = p[1]
+
+def p_ESTATUTO_llamada(p):
+    '''ESTATUTO : LLAMADA SEMICOLON'''
+    p[0] = ('ESTLLAMADA', p[1])
+
+def p_ESTATUTO_imprime(p):
+    '''ESTATUTO : IMPRIME'''
+    p[0] = p[1]
+
+def p_ESTATUTO_est(p):
+    '''ESTATUTO : LEFTBRACKET ESTATUTO RIGHTBRACKET'''
+    p[0] = ('ESTBRACKET', p[2])
+
+# ----- 7. EXPRESION -----
+def p_EXPRESION(p):
+    '''EXPRESION : EXP signsExp'''
+    if p[2] is None:
+        p[0] = p[1]
+    else:
+        op, right = p[2]
+        p[0] = ("relop", op, p[1], right)
+
+def p_signsExp(p):
+    '''signsExp :
+                 | GREATERTHAN EXP
+                 | LESSTHAN EXP
+                 | EQUAL EXP
+                 | NOTEQ EXP'''
+    if len(p) == 1:
+        p[0] = None
+    else:
+        if p.slice[1].type == 'GREATERTHAN':
+            op = '>'
+        elif p.slice[1].type == 'LESSTHAN':
+            op = '<'
+        elif p.slice[1].type == 'NOTEQ':
+            op = '!='
+        else:
+            op = '=='
+        p[0] = (op, p[2])
+
+# ----- 8. EXP -----
+def p_EXP(p):
+    '''EXP : TERMINO SoR'''
+    if p[2] is None:
+        p[0] = p[1]
+    else:
+        op, right = p[2]
+        p[0] = ("binop", op, p[1], right)
+
+def p_SoR(p):
+    '''SoR :
+           | PLUS EXP
+           | MINUS EXP'''
+    if len(p) == 1:
+        p[0] = None
+    else:
+        op = '+' if p.slice[1].type == 'PLUS' else '-'
+        p[0] = (op, p[2])
+
+# ----- 9. TERMINO -----
+def p_TERMINO(p):
+    '''TERMINO : FACTOR MoD'''
+    if p[2] is None:
+        p[0] = p[1]
+    else:
+        op, right = p[2]
+        p[0] = ("binop", op, p[1], right)
+
+def p_MoD(p):
+    '''MoD :
+            | MULT TERMINO
+            | DIVIDE TERMINO'''
+    if len(p) == 1:
+        p[0] = None
+    else:
+        op = '*' if p.slice[1].type == 'MULT' else '/'
+        p[0] = (op, p[2])
+
+# ----- 11. FACTOR -----
+def p_FACTOR_exp(p):
+    '''FACTOR : LEFTPAREN EXPRESION RIGHTPAREN'''
+    p[0] = p[2]
+
+def p_FACTOR_llamada(p):
+    '''FACTOR : LLAMADA'''
+    p[0] = p[1]
+
+def p_FACTOR_sign(p):
+    '''FACTOR : signSoR skipID'''
+    if p[1] is None:
+        p[0] = p[2]
+    else:
+        p[0] = ("unop", p[1], p[2])
+
+def p_signSoR(p):
+    '''signSoR :
+               | PLUS
+               | MINUS'''
+    if len(p) == 1:
+        p[0] = None
+    else:
+        p[0] = '+' if p.slice[1].type == 'PLUS' else '-'
+
+def p_skipID(p):
+    '''skipID : ID
+              | CTE'''
+    if p.slice[1].type == 'ID':
+        p[0] = ("id", p[1])
+    else:
+        p[0] = p[1]
+
+# ----- 12. LLAMADA -----
+def p_LLAMADA(p):
+    '''LLAMADA : ID LEFTPAREN args RIGHTPAREN'''
+    p[0] = ('LLAMADA', p[1], p[3])
+
+def p_args(p):
+    '''args :
+            | EXPRESION argsCycle'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = [p[1]] + p[2]
+
+def p_argsCycle(p):
+    '''argsCycle :
+                 | COMMA EXPRESION argsCycle '''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = [p[2]] + p[3]
+
+# ----- 13. VARS -----
+def p_VARS_sect(p):
+    '''VARS_sect : VARS p_VARS'''
+    p[0] = ('VARS', p[2])
+
+def p_p_VARS(p):
+    '''p_VARS : ID cycleID COLON TIPO SEMICOLON cycleP_VARS'''
+    names = [p[1]] + p[2]
+    decls = [("decl", n, p[4]) for n in names]
+    p[0] = decls + p[6]
+
+def p_cycleID(p):
+    '''cycleID :
+                | COMMA ID cycleID '''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = [p[2]] + p[3]
+
+def p_cycleP_VARS(p):
+    '''cycleP_VARS :
+                    | p_VARS'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
+
+# ----- 14. IMPRIME -----
+def p_IMPRIME(p):
+    '''IMPRIME : ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON'''
+    p[0] = ('IMPRIME', [p[3]] + p[4])
+
+def p_imp(p):
+    '''imp : LETRERO
+           | EXPRESION'''
+    if p.slice[1].type == 'LETRERO':
+        p[0] = ("letrero", p[1])
+    else:
+        p[0] = p[1]
+
+def p_cycleImp(p):
+    '''cycleImp :
+                 | COMMA imp cycleImp '''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = [p[2]] + p[3]
+
+# ----- 15. CICLO -----
+def p_CICLO(p):
+    '''CICLO : MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON'''
+    p[0] = ("mientras", p[3], p[6])
+
+# ----- 16. CONDICION -----
+def p_CONDICION(p):
+    '''CONDICION : SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON'''
+    p[0] = ('si', p[3], p[6], p[7])
+
+def p_sinoCuerpo(p):
+    '''sinoCuerpo :
+                   | SINO CUERPO '''
+    if len(p) == 1:
+        p[0] = None
+    else:
+        p[0] = ("sino", p[2])
 
 
-# 16. ----- F_Call
-
-# <F_CALL> -> id ( <skip_E'> ) ;
-def p_f_call(p):
-    'f_call : ID LPAREN skip_e_p RPAREN SEMI'
-    p[0] = ('f_call', p[1], p[3])
-
-# <skip_E'> -> <EXPRESION><c_loop'> | empty
-def p_skip_e_p(p):
-    ''' skip_e_p : empty
-                  | expresion c_loop_p '''
-    p[0] = [] if p[1] is None else [p[1]] + p[2]
-
-def p_c_loop_p(p):
-    ''' c_loop_p : empty
-                  | c_loop_p COMMA expresion '''
-    p[0] = [] if len(p) == 2 else p[1] + [p[3]]
-
-
-# ----- VACIO -----
-def p_empty(p):
-    'empty :'
-    p[0] = None
-
-# ----- ERRORES -----
+# ----- ERROR -----
 def p_error(p):
-    if p is None:
-        raise SyntaxError("Syntax error at EOF")
-    raise SyntaxError(f"Syntax error at '{p.value}' (line {p.lineno})")
+    if p:
+        print(f"[SYN] Error de sintaxis en '{p.value}' (token {p.type})")
+    else:
+        print("[SYN] Error de sintaxis en EOF")
 
-def build_parser():
-    lexer = build_lexer()
-    parser = yacc.yacc(start='start')
-    return lexer, parser
+parser = yacc.yacc()
 
+if __name__ == "__main__":
+    data = """
+    programa p;
+    inicio {
+        x = 3 + 5;
+    }
+    fin
+    """
+    result = parser.parse(data, lexer=lexer)
+    print("AST:")
+    print(result)

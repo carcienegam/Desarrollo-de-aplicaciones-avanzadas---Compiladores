@@ -68,7 +68,7 @@ t_RIGHTPAREN = r'\)'
 t_LEFTBRACKET = r'\['
 t_RIGHTBRACKET = r'\]'
 
-t_ignored = ' \t'
+t_ignore = ' \t'
 
 def t_COMMENT(t):
     r'//.*'
@@ -84,7 +84,7 @@ def t_CTE_ENT(t):
     t.value = int(t.value)
     return t
 
-def t_LETRETO(t): #strings
+def t_LETRERO(t): #strings
     r'"[^"\n]*"'
     t.value = t.value[1:-1]
     return t
@@ -102,4 +102,5 @@ def t_error(t):
     print(f"Illegal character '{t.value[0]}' at line {t.lexer.lineno}")
     t.lexer.skip(1)
 
-lexer = lex.lex()
+def build_lexer(**kwargs):
+    return lex.lex(**kwargs)
