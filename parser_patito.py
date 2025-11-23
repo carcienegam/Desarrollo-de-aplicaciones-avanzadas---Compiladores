@@ -4,7 +4,7 @@ from lex_patito import tokens, build_lexer
 lexer = build_lexer()
 
 precedence = (
-    ('left', 'GREATERTHAN', 'LESSTHAN', 'NOTEQ'),
+    ('left', 'GREATERTHAN', 'LESSTHAN', 'EQUAL', 'NOTEQ'),
     ('left', 'PLUS', 'MINUS'),
     ('left', 'MULT', 'DIVIDE'),
 )
@@ -148,42 +148,26 @@ def p_signsExp(p):
         p[0] = (op, p[2])
 
 # ----- 8. EXP -----
-def p_EXP(p):
-    '''EXP : TERMINO SoR'''
-    if p[2] is None:
-        p[0] = p[1]
-    else:
-        op, right = p[2]
-        p[0] = ("binop", op, p[1], right)
+def p_EXP_sign(p):
+    '''EXP : EXP PLUS TERMINO
+           | EXP MINUS TERMINO'''
+    op = p[2]
+    p[0] = ("binop", op, p[1], p[3])
 
-def p_SoR(p):
-    '''SoR :
-           | PLUS EXP
-           | MINUS EXP'''
-    if len(p) == 1:
-        p[0] = None
-    else:
-        op = '+' if p.slice[1].type == 'PLUS' else '-'
-        p[0] = (op, p[2])
+def p_EXP_term(p):
+    '''EXP : TERMINO'''
+    p[0] = p[1]
 
 # ----- 9. TERMINO -----
-def p_TERMINO(p):
-    '''TERMINO : FACTOR MoD'''
-    if p[2] is None:
-        p[0] = p[1]
-    else:
-        op, right = p[2]
-        p[0] = ("binop", op, p[1], right)
+def p_TERMINO_sign(p):
+    '''TERMINO : TERMINO MULT FACTOR
+               | TERMINO DIVIDE FACTOR'''
+    op = '*' if p[2] == '*' else '/'
+    p[0] = ("binop", op, p[1], p[3])
 
-def p_MoD(p):
-    '''MoD :
-            | MULT TERMINO
-            | DIVIDE TERMINO'''
-    if len(p) == 1:
-        p[0] = None
-    else:
-        op = '*' if p.slice[1].type == 'MULT' else '/'
-        p[0] = (op, p[2])
+def p_TERMINO_factor(p):
+    '''TERMINO : FACTOR'''
+    p[0] = p[1]
 
 # ----- 11. FACTOR -----
 def p_FACTOR_exp(p):
@@ -194,21 +178,17 @@ def p_FACTOR_llamada(p):
     '''FACTOR : LLAMADA'''
     p[0] = p[1]
 
-def p_FACTOR_sign(p):
-    '''FACTOR : signSoR skipID'''
-    if p[1] is None:
-        p[0] = p[2]
-    else:
-        p[0] = ("unop", p[1], p[2])
+def p_FACTOR_plus(p):
+    '''FACTOR : PLUS skipID'''
+    p[0] = p[2]
 
-def p_signSoR(p):
-    '''signSoR :
-               | PLUS
-               | MINUS'''
-    if len(p) == 1:
-        p[0] = None
-    else:
-        p[0] = '+' if p.slice[1].type == 'PLUS' else '-'
+def p_FACTOR_minus(p):
+    '''FACTOR : MINUS skipID'''
+    p[0] = ("unop", '-', p[2])
+
+def p_FACTOR_simple(p):
+    '''FACTOR : skipID'''
+    p[0] = p[1]
 
 def p_skipID(p):
     '''skipID : ID
@@ -319,7 +299,7 @@ if __name__ == "__main__":
     data = """
     programa p;
     inicio {
-        x = 3 + 5;
+        x = + * 3;
     }
     fin
     """

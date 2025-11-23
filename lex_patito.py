@@ -104,3 +104,22 @@ def t_error(t):
 
 def build_lexer(**kwargs):
     return lex.lex(**kwargs)
+
+if __name__ == "__main__":
+    data = """
+    programa p;
+    vars
+        x : entero;
+    inicio {
+        x = 10;
+        escribe("Valor de x: ", x, " doble: ", x * 2);
+    }
+    fin
+
+    """
+
+    lexer = build_lexer()
+    lexer.input(data)
+    for tok in lexer:
+        print(tok)
+

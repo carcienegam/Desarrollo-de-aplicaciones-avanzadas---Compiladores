@@ -1,0 +1,144 @@
+# Programa minimo sin vars ni funciones
+
+programa p;
+inicio {
+    x = 3 + 5;
+}
+fin
+
+# Declaracion de variables enteras y flotantes + asignaciones
+programa p;
+vars
+    x, y : entero;
+    z : flotante;
+inicio {
+    x = 3;
+    y = x + 5;
+    z = 1.5;
+}
+fin
+
+# Expresiones con precedencia y parentesis
+programa p;
+inicio {
+    x = 3 + 4 * 2;
+    y = (3 + 4) * 2;
+}
+fin
+
+# Control de flujo mientras, si/no
+programa p;
+vars
+    x : entero;
+inicio {
+    x = 0;
+    mientras (x < 10) haz {
+        x = x + 1;
+    };
+}
+fin
+
+# si sin sino
+programa p;
+vars
+    x : entero;
+inicio {
+    x = 5;
+    si (x > 0) haz {
+        escribe("positivo");
+    };
+}
+fin
+
+# si con sino 
+programa p;
+vars
+    x : entero;
+inicio {
+    x = -1;
+    si (x > 0) haz {
+        escribe("positivo");
+    } sino {
+        escribe("no positivo");
+    };
+}
+fin
+
+# Anidacion de si y mientras 
+programa p;
+vars
+    x : entero;
+inicio {
+    x = 0;
+    mientras (x < 5) haz {
+        si (x == 3) haz {
+            escribe("tres");
+        } sino {
+            escribe(x);
+        };
+        x = x + 1;
+    };
+}
+fin
+
+# Funciones y llamadas
+programa p;
+    nula foo() {
+        {
+            escribe("en foo");
+        }
+    };
+    inicio {
+        foo();
+    }
+    fin
+
+# Funcion con parametros y llamada con expresion
+programa p;
+entero suma(a : entero, b : entero) {
+    {
+        escribe(a + b);
+    }
+};
+inicio {
+    suma(3, 4);
+    suma(1 + 2, 5 * 2);
+}
+fin
+
+# Escribe con textos y expresiones
+programa p;
+vars
+    x : entero;
+inicio {
+    x = 10;
+    escribe("Valor de x: ", x, " doble: ", x * 2);
+}
+fin
+
+# CASOS NEGATIVOS ERRORES DE SINTAXIS
+programa p;
+inicio {
+    x = 3 + 5    // falta ;
+}
+fin
+
+programa p;
+inicio {
+    mientras (x < 10 haz {
+        x = x + 1;
+    };
+}
+fin
+
+
+programa p;
+inicio {
+    x = 3 + 5;
+fin
+
+programa p;
+inicio {
+    x = + * 3;
+}
+fin
