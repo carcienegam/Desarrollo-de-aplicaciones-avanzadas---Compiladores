@@ -1,3 +1,5 @@
+from semantics import vm
+
 class EmptyStackError(Exception):
     pass
 
@@ -44,15 +46,17 @@ class QuadManager():
         self.pila_operandos = Stack("pila_operandos")
         self.pila_operadores = Stack("pila_operadores")
         self.pila_tipos = Stack("pila_tipos")
+        self.pila_saltos = Stack("pila_saltos")
 
         self.cuadruplos = [] # Lista de cuadruplos
 
         self.count_temporales = 0
 
-    def new_temporal(self):
+    def new_temporal(self, tipo):
         name = f't{self.count_temporales}'
         self.count_temporales += 1
-        return name
+        address = vm.allocate_temporal(tipo)
+        return address
         
     def add_cuadruplo(self, op, left_op=None, right_op=None, result=None):
         cuadruplo = Quadruple(op, left_op, right_op, result)
@@ -75,8 +79,10 @@ class QuadManager():
                 f"  {self.pila_operandos}\n"
                 f"  {self.pila_operadores}\n"
                 f"  {self.pila_tipos}\n"
+                f"  {self.pila_saltos}\n"
                 f"  cuadruplos={self.cuadruplos}\n"
                 f")")
+    
 
 # if __name__ == "__main__":
 #     qm = QuadManager()

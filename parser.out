@@ -65,10 +65,16 @@ Rule 59    imp -> LETRERO
 Rule 60    imp -> EXPRESION
 Rule 61    cycleImp -> <empty>
 Rule 62    cycleImp -> COMMA imp cycleImp
-Rule 63    CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON
-Rule 64    CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON
-Rule 65    sinoCuerpo -> <empty>
-Rule 66    sinoCuerpo -> SINO CUERPO
+Rule 63    CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
+Rule 64    ciclo_start -> <empty>
+Rule 65    ciclo_goToF -> <empty>
+Rule 66    ciclo_end -> <empty>
+Rule 67    CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+Rule 68    CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
+Rule 69    if_goToF -> <empty>
+Rule 70    if_noElse -> <empty>
+Rule 71    if_else -> <empty>
+Rule 72    if_else_end -> <empty>
 
 Terminals, with rules where they appear
 
@@ -84,12 +90,12 @@ ESCRIBE              : 58
 FIN                  : 1
 FLOTANTE             : 13
 GREATERTHAN          : 30
-HAZ                  : 63 64
+HAZ                  : 63
 ID                   : 1 9 14 19 45 47 53 55
 INICIO               : 1
 LEFTBRACE            : 6 15
 LEFTBRACKET          : 27
-LEFTPAREN            : 14 40 47 58 63 64
+LEFTPAREN            : 14 40 47 58 63 67 68
 LESSTHAN             : 31
 LETRERO              : 59
 MIENTRAS             : 63
@@ -101,10 +107,10 @@ PLUS                 : 34 42
 PROGRAMA             : 1
 RIGHTBRACE           : 6 15
 RIGHTBRACKET         : 27
-RIGHTPAREN           : 14 40 47 58 63 64
-SEMICOLON            : 1 9 15 25 53 58 63 64
-SI                   : 64
-SINO                 : 66
+RIGHTPAREN           : 14 40 47 58 63 67 68
+SEMICOLON            : 1 9 15 25 53 58 63 67 68
+SI                   : 67 68
+SINO                 : 68
 VARS                 : 52
 error                : 
 
@@ -114,10 +120,10 @@ ASIGNA               : 22
 CICLO                : 24
 CONDICION            : 23
 CTE                  : 46
-CUERPO               : 1 15 63 64 66
+CUERPO               : 1 15 63 67 68 68
 ESTATUTO             : 8 27
 EXP                  : 28 30 31 32 33 34 35
-EXPRESION            : 9 40 49 51 60 63 64
+EXPRESION            : 9 40 49 51 60 63 67 68
 FACTOR               : 37 38 39
 FUNCS                : 5
 IMPRIME              : 26
@@ -127,6 +133,9 @@ TIPO                 : 17 19 53
 VARS_sect            : 3
 args                 : 47
 argsCycle            : 49 51
+ciclo_end            : 63
+ciclo_goToF          : 63
+ciclo_start          : 63
 commaCycleFuncs      : 19
 cycleEst             : 6 8
 cycleFuncs           : 1 5
@@ -134,12 +143,15 @@ cycleID              : 53 55
 cycleImp             : 58 62
 cycleP_VARS          : 53
 funcsHeader          : 15
+if_else              : 68
+if_else_end          : 68
+if_goToF             : 67 68
+if_noElse            : 67
 imp                  : 58 62
 p_Follow             : 14 21
 p_VARS               : 52 57
 programa             : 0
 signsExp             : 28
-sinoCuerpo           : 64
 skipID               : 42 43 44
 skipVars             : 1 15
 typeNull             : 14
@@ -403,8 +415,9 @@ state 25
     (26) ESTATUTO -> . IMPRIME
     (27) ESTATUTO -> . LEFTBRACKET ESTATUTO RIGHTBRACKET
     (9) ASIGNA -> . ID ASSIGN EXPRESION SEMICOLON
-    (64) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON
-    (63) CICLO -> . MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON
+    (67) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (68) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
+    (63) CICLO -> . MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
     (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
     (58) IMPRIME -> . ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
 
@@ -491,8 +504,9 @@ state 32
     (26) ESTATUTO -> . IMPRIME
     (27) ESTATUTO -> . LEFTBRACKET ESTATUTO RIGHTBRACKET
     (9) ASIGNA -> . ID ASSIGN EXPRESION SEMICOLON
-    (64) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON
-    (63) CICLO -> . MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON
+    (67) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (68) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
+    (63) CICLO -> . MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
     (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
     (58) IMPRIME -> . ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
 
@@ -580,8 +594,9 @@ state 38
     (26) ESTATUTO -> . IMPRIME
     (27) ESTATUTO -> . LEFTBRACKET ESTATUTO RIGHTBRACKET
     (9) ASIGNA -> . ID ASSIGN EXPRESION SEMICOLON
-    (64) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON
-    (63) CICLO -> . MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON
+    (67) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (68) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
+    (63) CICLO -> . MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
     (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
     (58) IMPRIME -> . ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
 
@@ -609,17 +624,20 @@ state 39
 
 state 40
 
-    (64) CONDICION -> SI . LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON
+    (67) CONDICION -> SI . LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (68) CONDICION -> SI . LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
 
     LEFTPAREN       shift and go to state 54
 
 
 state 41
 
-    (63) CICLO -> MIENTRAS . LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON
+    (63) CICLO -> MIENTRAS . ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
+    (64) ciclo_start -> .
 
-    LEFTPAREN       shift and go to state 55
+    LEFTPAREN       reduce using rule 64 (ciclo_start -> .)
 
+    ciclo_start                    shift and go to state 55
 
 state 42
 
@@ -778,7 +796,8 @@ state 53
 
 state 54
 
-    (64) CONDICION -> SI LEFTPAREN . EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON
+    (67) CONDICION -> SI LEFTPAREN . EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (68) CONDICION -> SI LEFTPAREN . EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
     (28) EXPRESION -> . EXP signsExp
     (34) EXP -> . EXP PLUS TERMINO
     (35) EXP -> . EXP MINUS TERMINO
@@ -814,39 +833,10 @@ state 54
 
 state 55
 
-    (63) CICLO -> MIENTRAS LEFTPAREN . EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON
-    (28) EXPRESION -> . EXP signsExp
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (63) CICLO -> MIENTRAS ciclo_start . LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    LEFTPAREN       shift and go to state 78
 
-    EXPRESION                      shift and go to state 78
-    EXP                            shift and go to state 64
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 56
 
@@ -1199,17 +1189,47 @@ state 76
 
 state 77
 
-    (64) CONDICION -> SI LEFTPAREN EXPRESION . RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON
+    (67) CONDICION -> SI LEFTPAREN EXPRESION . RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (68) CONDICION -> SI LEFTPAREN EXPRESION . RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
 
     RIGHTPAREN      shift and go to state 103
 
 
 state 78
 
-    (63) CICLO -> MIENTRAS LEFTPAREN EXPRESION . RIGHTPAREN HAZ CUERPO SEMICOLON
+    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN . EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
+    (28) EXPRESION -> . EXP signsExp
+    (34) EXP -> . EXP PLUS TERMINO
+    (35) EXP -> . EXP MINUS TERMINO
+    (36) EXP -> . TERMINO
+    (37) TERMINO -> . TERMINO MULT FACTOR
+    (38) TERMINO -> . TERMINO DIVIDE FACTOR
+    (39) TERMINO -> . FACTOR
+    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (41) FACTOR -> . LLAMADA
+    (42) FACTOR -> . PLUS skipID
+    (43) FACTOR -> . MINUS skipID
+    (44) FACTOR -> . skipID
+    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
+    (45) skipID -> . ID
+    (46) skipID -> . CTE
+    (10) CTE -> . CTE_ENT
+    (11) CTE -> . CTE_FLOAT
 
-    RIGHTPAREN      shift and go to state 104
+    LEFTPAREN       shift and go to state 69
+    PLUS            shift and go to state 65
+    MINUS           shift and go to state 67
+    ID              shift and go to state 62
+    CTE_ENT         shift and go to state 73
+    CTE_FLOAT       shift and go to state 74
 
+    EXPRESION                      shift and go to state 104
+    EXP                            shift and go to state 64
+    TERMINO                        shift and go to state 66
+    FACTOR                         shift and go to state 68
+    LLAMADA                        shift and go to state 70
+    skipID                         shift and go to state 71
+    CTE                            shift and go to state 72
 
 state 79
 
@@ -1671,16 +1691,19 @@ state 102
 
 state 103
 
-    (64) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN . HAZ CUERPO sinoCuerpo SEMICOLON
+    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN . if_goToF CUERPO if_noElse SEMICOLON
+    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN . if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
+    (69) if_goToF -> .
 
-    HAZ             shift and go to state 119
+    LEFTBRACE       reduce using rule 69 (if_goToF -> .)
 
+    if_goToF                       shift and go to state 119
 
 state 104
 
-    (63) CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN . HAZ CUERPO SEMICOLON
+    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION . RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
 
-    HAZ             shift and go to state 120
+    RIGHTPAREN      shift and go to state 120
 
 
 state 105
@@ -1902,7 +1925,8 @@ state 118
 
 state 119
 
-    (64) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ . CUERPO sinoCuerpo SEMICOLON
+    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF . CUERPO if_noElse SEMICOLON
+    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF . CUERPO SINO if_else CUERPO if_else_end SEMICOLON
     (6) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
 
     LEFTBRACE       shift and go to state 25
@@ -1911,12 +1935,12 @@ state 119
 
 state 120
 
-    (63) CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ . CUERPO SEMICOLON
-    (6) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
+    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN . ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
+    (65) ciclo_goToF -> .
 
-    LEFTBRACE       shift and go to state 25
+    HAZ             reduce using rule 65 (ciclo_goToF -> .)
 
-    CUERPO                         shift and go to state 126
+    ciclo_goToF                    shift and go to state 126
 
 state 121
 
@@ -1952,20 +1976,20 @@ state 124
 
 state 125
 
-    (64) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO . sinoCuerpo SEMICOLON
-    (65) sinoCuerpo -> .
-    (66) sinoCuerpo -> . SINO CUERPO
+    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO . if_noElse SEMICOLON
+    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO . SINO if_else CUERPO if_else_end SEMICOLON
+    (70) if_noElse -> .
 
-    SEMICOLON       reduce using rule 65 (sinoCuerpo -> .)
     SINO            shift and go to state 130
+    SEMICOLON       reduce using rule 70 (if_noElse -> .)
 
-    sinoCuerpo                     shift and go to state 129
+    if_noElse                      shift and go to state 129
 
 state 126
 
-    (63) CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO . SEMICOLON
+    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF . HAZ CUERPO ciclo_end SEMICOLON
 
-    SEMICOLON       shift and go to state 131
+    HAZ             shift and go to state 131
 
 
 state 127
@@ -1990,49 +2014,105 @@ state 128
 
 state 129
 
-    (64) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo . SEMICOLON
+    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse . SEMICOLON
 
     SEMICOLON       shift and go to state 132
 
 
 state 130
 
-    (66) sinoCuerpo -> SINO . CUERPO
+    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO . if_else CUERPO if_else_end SEMICOLON
+    (71) if_else -> .
+
+    LEFTBRACE       reduce using rule 71 (if_else -> .)
+
+    if_else                        shift and go to state 133
+
+state 131
+
+    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ . CUERPO ciclo_end SEMICOLON
     (6) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
 
     LEFTBRACE       shift and go to state 25
 
-    CUERPO                         shift and go to state 133
-
-state 131
-
-    (63) CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON .
-
-    LEFTBRACKET     reduce using rule 63 (CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON .)
-    ID              reduce using rule 63 (CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON .)
-    SI              reduce using rule 63 (CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON .)
-    MIENTRAS        reduce using rule 63 (CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON .)
-    ESCRIBE         reduce using rule 63 (CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON .)
-    RIGHTBRACE      reduce using rule 63 (CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON .)
-    RIGHTBRACKET    reduce using rule 63 (CICLO -> MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON .)
-
+    CUERPO                         shift and go to state 134
 
 state 132
 
-    (64) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON .
+    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .
 
-    LEFTBRACKET     reduce using rule 64 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON .)
-    ID              reduce using rule 64 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON .)
-    SI              reduce using rule 64 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON .)
-    MIENTRAS        reduce using rule 64 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON .)
-    ESCRIBE         reduce using rule 64 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON .)
-    RIGHTBRACE      reduce using rule 64 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON .)
-    RIGHTBRACKET    reduce using rule 64 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON .)
+    LEFTBRACKET     reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    ID              reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    SI              reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    MIENTRAS        reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    ESCRIBE         reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    RIGHTBRACE      reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
 
 
 state 133
 
-    (66) sinoCuerpo -> SINO CUERPO .
+    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else . CUERPO if_else_end SEMICOLON
+    (6) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
 
-    SEMICOLON       reduce using rule 66 (sinoCuerpo -> SINO CUERPO .)
+    LEFTBRACE       shift and go to state 25
+
+    CUERPO                         shift and go to state 135
+
+state 134
+
+    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO . ciclo_end SEMICOLON
+    (66) ciclo_end -> .
+
+    SEMICOLON       reduce using rule 66 (ciclo_end -> .)
+
+    ciclo_end                      shift and go to state 136
+
+state 135
+
+    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO . if_else_end SEMICOLON
+    (72) if_else_end -> .
+
+    SEMICOLON       reduce using rule 72 (if_else_end -> .)
+
+    if_else_end                    shift and go to state 137
+
+state 136
+
+    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end . SEMICOLON
+
+    SEMICOLON       shift and go to state 138
+
+
+state 137
+
+    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end . SEMICOLON
+
+    SEMICOLON       shift and go to state 139
+
+
+state 138
+
+    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .
+
+    LEFTBRACKET     reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
+    ID              reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
+    SI              reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
+    MIENTRAS        reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
+    ESCRIBE         reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
+    RIGHTBRACE      reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
+
+
+state 139
+
+    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .
+
+    LEFTBRACKET     reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
+    ID              reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
+    SI              reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
+    MIENTRAS        reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
+    ESCRIBE         reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
+    RIGHTBRACE      reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
 

@@ -1,5 +1,3 @@
-# test_quads_patito.py
-
 import importlib
 from semantics import SemanticError
 
@@ -69,7 +67,7 @@ tests = [
             x : entero;
         inicio {
             x = 5;
-            si (x > 3) haz {
+            si (x > 3) {
                 escribe("mayor que 3");
             };
         }

@@ -2,6 +2,63 @@ class SemanticError(Exception):
     """Errores semánticos (redeclaraciones, tipos inválidos, etc.)."""
     pass
 
+
+# ----- Memoria virtual -----
+class VirtualMemory:
+    def __init__(self):
+        self.memory = {
+            'global': {'entero': 1000, 'flotante': 2000, 'bool': 3000},
+            'local': {'entero': 4000, 'flotante': 5000, 'bool': 6000},
+            'temporal': {'entero': 7000, 'flotante': 8000, 'bool': 9000},
+            'const': {'entero': 10000, 'flotante': 11000, 'letrero': 12000}
+        }
+
+        self.counters = {
+            segment: {t: memory for t, memory in tipos.items()}
+            for segment, tipos in self.memory.items()
+        }
+
+        self.const_tables = {
+            'entero': {},
+            'flotante': {},
+            'letrero': {}
+        }
+
+    def scope_segment(self, scope_level):
+        return 'global' if scope_level == 'global' else 'local'
+        
+    def allocate_variable(self, scope_level, var_type) -> int:
+        segment = self.scope_segment(scope_level)
+        if var_type not in self.counters[segment]:
+            raise ValueError(f"Type '{var_type}' not supported in segment '{segment}'")
+        address = self.counters[segment][var_type]
+        self.counters[segment][var_type] += 1
+        return address
+        
+    def allocate_temporal(self, temp_type) -> int:
+        segment = 'temporal'
+        if temp_type not in self.counters[segment]:
+            raise ValueError(f"Type '{temp_type}' not supported in segment '{segment}'")
+        address = self.counters[segment][temp_type]
+        self.counters[segment][temp_type] += 1
+        return address
+        
+    def get_constant(self, value, const_type) -> int:
+        if const_type not in self.const_tables:
+            raise ValueError(f"Constant type '{const_type}' not supported")
+        table = self.const_tables[const_type]
+
+        if value in table:
+            return table[value]
+            
+        segment = 'const'
+        address = self.counters[segment][const_type]
+        self.counters[segment][const_type] += 1
+        table[value] = address
+        return address
+        
+vm = VirtualMemory()
+
 # ----- Variables -----
 
 class VariableInfo:
@@ -23,7 +80,9 @@ class VariableTable:
     def add_variable(self, name, var_type, kind='var'):
         if name in self.table:
             raise SemanticError(f"Variable '{name}' already declared in scope '{self.scope_name}'")
-        self.table[name] = VariableInfo(name, var_type, self.scope_name, kind)
+        
+        address = vm.allocate_variable(self.scope_name, var_type)
+        self.table[name] = VariableInfo(name, var_type, self.scope_name, kind, address)
 
     def get_vars(self, name):
         return self.table.get(name, None)

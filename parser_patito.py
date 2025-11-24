@@ -1,7 +1,7 @@
 import ply.yacc as yacc
 from lex_patito import tokens, build_lexer
 
-from semantics import FuncDirectory, SemanticError, tipo_to_str, function_directory
+from semantics import FuncDirectory, SemanticError, tipo_to_str, function_directory, vm
 from semantic_cube import check_types
 
 from quads import QuadManager
@@ -36,6 +36,18 @@ def get_var_type(name):
 
     raise SemanticError(f"Variable '{name}' not declared")
 
+def get_var_info(name):
+    if current_function and dir_funcs.exists(current_function):
+        t = dir_funcs.get_funcs(current_function).var_table.get_vars(name)
+        if t:
+            return t
+
+    g = dir_funcs.get_funcs("global").var_table.get_vars(name)
+    if g:
+        return g
+
+    raise SemanticError(f"Variable '{name}' not declared")
+
 def binop_cuadruplo(op):
     # Cuadruplos para operaciones binarias (+, -, *, /)
     right = quad_manager.pila_operandos.pop()
@@ -44,13 +56,13 @@ def binop_cuadruplo(op):
     left_type = quad_manager.pila_tipos.pop()
 
     result_type = check_types(op, left_type, right_type)
-    temporal = quad_manager.new_temporal()
-    quad_manager.add_cuadruplo(op, left, right, temporal)
+    temporal_address = quad_manager.new_temporal(result_type)
+    quad_manager.add_cuadruplo(op, left, right, temporal_address)
 
-    quad_manager.pila_operandos.push(temporal)
+    quad_manager.pila_operandos.push(temporal_address)
     quad_manager.pila_tipos.push(result_type)
 
-    return ('temp', temporal, result_type)
+    return ('temp', temporal_address, result_type)
 
 def relop_cuadruplo(op):
     # Cuadruplos para operaciones relacionales (<, >, ==, !=)
@@ -60,26 +72,26 @@ def relop_cuadruplo(op):
     left_type = quad_manager.pila_tipos.pop()
 
     result_type = check_types(op, left_type, right_type)
-    temporal = quad_manager.new_temporal()
-    quad_manager.add_cuadruplo(op, left, right, temporal)
+    temporal_address = quad_manager.new_temporal(result_type)
+    quad_manager.add_cuadruplo(op, left, right, temporal_address)
 
-    quad_manager.pila_operandos.push(temporal)
+    quad_manager.pila_operandos.push(temporal_address)
     quad_manager.pila_tipos.push(result_type)
 
-    return ('temp', temporal, result_type)
+    return ('temp', temporal_address, result_type)
 
 def unminus_cuadruplo(op):
     # Cuadruplos para operación unaria (-)
     operand = quad_manager.pila_operandos.pop()
     operand_type = quad_manager.pila_tipos.pop()
 
-    temporal = quad_manager.new_temporal()
-    quad_manager.add_cuadruplo('uminus', operand, None, temporal)
+    temporal_address = quad_manager.new_temporal(operand_type)
+    quad_manager.add_cuadruplo('uminus', operand, None, temporal_address)
 
-    quad_manager.pila_operandos.push(temporal)
+    quad_manager.pila_operandos.push(temporal_address)
     quad_manager.pila_tipos.push(operand_type)
 
-    return ('temp', temporal, operand_type)
+    return ('temp', temporal_address, operand_type)
 
 
 # ----- 1. Programa -----
@@ -131,15 +143,18 @@ def p_cycleEst(p):
 # ----- 3. Asigna ------
 def p_ASIGNA(p):
     '''ASIGNA : ID ASSIGN EXPRESION SEMICOLON'''
+    left_info = get_var_info(p[1])
     left_type = get_var_type(p[1])
+    left_address = left_info.address
+
     right_type = p[3][-1]
     check_types('=', left_type, right_type)
 
-    _, address, _ = p[3]
+    _, right_address, _ = p[3]
 
-    quad_manager.add_cuadruplo('=', address, None, p[1])
+    quad_manager.add_cuadruplo('=', right_address, None, left_address)
 
-    p[0] = ('ASIGNA', p[1], p[3], left_type)
+    p[0] = ('ASIGNA', left_address, p[3], left_type)
 
 # ----- 4. CTE -----
 def p_CTE_ent(p):
@@ -317,20 +332,23 @@ def p_skipID(p):
     '''skipID : ID
               | CTE'''
     if p.slice[1].type == 'ID':
+        var_info = get_var_info(p[1])
         var_type = get_var_type(p[1])
+        address = var_info.address
 
-        quad_manager.pila_operandos.push(p[1])
+        quad_manager.pila_operandos.push(address)
         quad_manager.pila_tipos.push(var_type)
 
-        p[0] = ("id", p[1], var_type)
+        p[0] = ("id", address, var_type)
     else:
         kind, value = p[1]
         const_type = 'entero' if kind == 'cte_ent' else 'flotante'
+        const_address = vm.get_constant(value, const_type)
 
-        quad_manager.pila_operandos.push(value)
+        quad_manager.pila_operandos.push(const_address)
         quad_manager.pila_tipos.push(const_type)
 
-        p[0] = ("cte", value, const_type)
+        p[0] = ("cte", const_address, const_type)
             
 
 # ----- 12. LLAMADA -----
@@ -397,20 +415,17 @@ def p_IMPRIME(p):
     items = [p[3]] + p[4]
 
     for item in items:
-        kind = item[0]
-        if kind == 'letrero':
-            value = item[1]
-        else:
-            value = item[1]
+        address = item[1]
+        quad_manager.add_cuadruplo('IMPRIME', address, None, None)
 
-        quad_manager.add_cuadruplo('IMPRIME', value, None, None)
     p[0] = ('IMPRIME', items)
 
 def p_imp(p):
     '''imp : LETRERO
            | EXPRESION'''
     if p.slice[1].type == 'LETRERO':
-        p[0] = ("letrero", p[1], 'letrero')
+        address = vm.get_constant(p[1], 'letrero')
+        p[0] = ("letrero", address, 'letrero')
     else:
         p[0] = p[1]
 
@@ -424,22 +439,74 @@ def p_cycleImp(p):
 
 # ----- 15. CICLO -----
 def p_CICLO(p):
-    '''CICLO : MIENTRAS LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO SEMICOLON'''
-    p[0] = ("mientras", p[3], p[6])
+    '''CICLO : MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON'''
+    p[0] = ("mientras", p[4], p[8])
+
+def p_ciclo_start(p):
+    '''ciclo_start :'''
+    start_idx =  len(quad_manager.cuadruplos)
+    quad_manager.pila_saltos.push(start_idx)
+
+def p_ciclo_goToF(p):
+    '''ciclo_goToF :'''
+    cond_address = quad_manager.pila_operandos.pop()
+    cond_type = quad_manager.pila_tipos.pop()
+
+    if cond_type != 'bool':
+        raise SemanticError("Condicion mientras debe ser tipo bool")
+    
+    goToF_idx = quad_manager.add_cuadruplo('GOTOF', cond_address, None, None)
+    quad_manager.pila_saltos.push(goToF_idx)
+
+def p_ciclo_end(p):
+    '''ciclo_end :'''
+    goToF_idx = quad_manager.pila_saltos.pop()
+    start_idx = quad_manager.pila_saltos.pop()
+    quad_manager.add_cuadruplo('GOTO', None, None, start_idx)
+
+    exit_idx = len(quad_manager.cuadruplos)
+    quad_manager.fill_cuadruplos(goToF_idx, exit_idx)
+
 
 # ----- 16. CONDICION -----
-def p_CONDICION(p):
-    '''CONDICION : SI LEFTPAREN EXPRESION RIGHTPAREN HAZ CUERPO sinoCuerpo SEMICOLON'''
-    p[0] = ('si', p[3], p[6], p[7])
+def p_CONDICION_if(p):
+    '''CONDICION : SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON'''
+    p[0] = ('si', p[3], p[6], None)
 
-def p_sinoCuerpo(p):
-    '''sinoCuerpo :
-                   | SINO CUERPO '''
-    if len(p) == 1:
-        p[0] = None
-    else:
-        p[0] = ("sino", p[2])
+def p_CONDICION_ifelse(p):
+    '''CONDICION : SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON'''
+    p[0] = ('si', p[3], p[6], p[9])
 
+def p_if_goToF(p):
+    '''if_goToF :'''
+    cond_address = quad_manager.pila_operandos.pop()
+    cond_type = quad_manager.pila_tipos.pop()
+
+    if cond_type != 'bool':
+        raise SemanticError("Condicion si debe ser tipo bool")
+    
+    goToF_idx = quad_manager.add_cuadruplo('GOTOF', cond_address, None, None)
+    quad_manager.pila_saltos.push(goToF_idx)
+
+def p_if_noElse(p):
+    '''if_noElse :'''
+    goToF_idx = quad_manager.pila_saltos.pop()
+    exit_idx = len(quad_manager.cuadruplos)
+    quad_manager.fill_cuadruplos(goToF_idx, exit_idx)
+
+def p_if_else(p):
+    '''if_else :'''
+    goTo_idx = quad_manager.add_cuadruplo('GOTO', None, None, None)
+    goToF_idx = quad_manager.pila_saltos.pop()
+    quad_manager.fill_cuadruplos(goToF_idx, len(quad_manager.cuadruplos))
+
+    quad_manager.pila_saltos.push(goTo_idx)
+
+def p_if_else_end(p):
+    '''if_else_end :'''
+    goTo_idx = quad_manager.pila_saltos.pop()
+    exit_idx = len(quad_manager.cuadruplos)
+    quad_manager.fill_cuadruplos(goTo_idx, exit_idx)
 
 # ----- ERROR -----
 def p_error(p):
@@ -456,8 +523,13 @@ if __name__ == "__main__":
     vars
         x : entero;
     inicio {
-        escribe("Valor de x: ", x, " doble: ", x * 2);
+        si (x > 0) {
+            escribe("positivo");
+        } sino {
+            escribe("no positivo");
+        };
     }
+
 
     """
     result = parser.parse(data, lexer=lexer)
@@ -466,5 +538,7 @@ if __name__ == "__main__":
 
     function_directory(dir_funcs)
 
-    print("\nCuádruplos:")
+    print("\nCuádruplos con direcciones:")
     quad_manager.print_cuadruplos()
+
+    
