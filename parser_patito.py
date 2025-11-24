@@ -2,6 +2,7 @@ import ply.yacc as yacc
 from lex_patito import tokens, build_lexer
 
 from semantics import FuncDirectory, SemanticError, tipo_to_str, function_directory
+from semantic_cube import check_types
 
 lexer = build_lexer()
 
@@ -15,19 +16,34 @@ start = 'programa'
 
 dir_funcs = FuncDirectory()
 
+current_function = None
+dir_funcs.add_function("global", "nula")
+
+def get_var_type(name):
+    if current_function and dir_funcs.exists(current_function):
+        t = dir_funcs.get_funcs(current_function).var_table.get_vars(name)
+        if t:
+            return t.type
+
+    g = dir_funcs.get_funcs("global").var_table.get_vars(name)
+    if g:
+        return g.type
+
+    raise SemanticError(f"Variable '{name}' not declared")
+
 # ----- 1. Programa -----
 def p_programa(p):
     '''programa : PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN'''
     prog_name = p[2]
 
-    global_func = dir_funcs.add_function('global', 'nula')
+    # global_func = dir_funcs.add_function("global")
 
-    global_vars = p[4]
-    if global_vars is not None:
-        tag, decls = global_vars
-        for (_, name, tipo) in decls:
-            var_type = tipo_to_str(tipo)
-            global_func.var_table.add_variable(name, var_type, kind='var')
+    # global_vars = p[4]
+    # if global_vars is not None:
+    #     tag, decls = global_vars
+    #     for (_, name, tipo) in decls:
+    #         var_type = tipo_to_str(tipo)
+    #         global_func.var_table.add_variable(name, var_type, kind='var')
 
     p[0] = ('programa', prog_name, p[4], p[5], p[7])
 
@@ -37,7 +53,19 @@ def p_skipVars(p):
     if len(p) == 1:
         p[0] = None
     else:
-        p[0] = p[1]
+        vars_ast = p[1]
+        tag, decls = vars_ast
+
+        if current_function and dir_funcs.exists(current_function):
+            func_info = dir_funcs.get_funcs(current_function)
+        else:
+            func_info = dir_funcs.get_funcs("global")
+
+        for (_, name, tipo) in decls:
+            var_type = tipo_to_str(tipo)
+            func_info.var_table.add_variable(name, var_type, kind='var')
+
+        p[0] = vars_ast
 
 def p_cycleFuncs(p):
     '''cycleFuncs :
@@ -63,7 +91,10 @@ def p_cycleEst(p):
 # ----- 3. Asigna ------
 def p_ASIGNA(p):
     '''ASIGNA : ID ASSIGN EXPRESION SEMICOLON'''
-    p[0] = ('ASIGNA', p[1], p[3])
+    left_type = get_var_type(p[1])
+    right_type = p[3][-1]
+    result = check_types('=', left_type, right_type)
+    p[0] = ('ASIGNA', p[1], p[3], result)
 
 # ----- 4. CTE -----
 def p_CTE_ent(p):
@@ -84,11 +115,14 @@ def p_TIPO(p):
         p[0] = ('flotante',)
 
 # ----- 5. Funciones -----
-def p_FUNCS(p):
-    '''FUNCS : typeNull ID LEFTPAREN p_Follow RIGHTPAREN LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON'''
+def p_funcsHeader(p):
+    '''funcsHeader : typeNull ID LEFTPAREN p_Follow RIGHTPAREN'''
 
+    global current_function
     return_type = tipo_to_str(p[1])
     func_name = p[2]
+
+    current_function = func_name
 
     func_info = dir_funcs.add_function(func_name, return_type)
 
@@ -97,14 +131,20 @@ def p_FUNCS(p):
         param_type = tipo_to_str(tipo)
         func_info.add_parameter(param_name, param_type)
 
-    local_vars = p[7]
-    if local_vars is not None:
-        tag, decls = local_vars
-        for (_, name, tipo) in decls:
-            var_type = tipo_to_str(tipo)
-            func_info.var_table.add_variable(name, var_type, kind='var')
+    p[0] = (p[1], func_name, params)
 
-    p[0] = ('FUNCS', p[1], func_name, p[4], p[7], p[8])
+
+def p_FUNCS(p):
+    '''FUNCS : funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON'''
+    global current_function
+
+    type_null, func_name, params = p[1]
+    local_vars = p[3]
+    cuerpo = p[4]
+
+    current_function = None
+
+    p[0] = ('FUNCS', type_null, func_name, params, local_vars, cuerpo)
 
 
 def p_typeNull(p):
@@ -186,7 +226,10 @@ def p_EXP_sign(p):
     '''EXP : EXP PLUS TERMINO
            | EXP MINUS TERMINO'''
     op = p[2]
-    p[0] = ("binop", op, p[1], p[3])
+    left_type = p[1][-1]
+    right_type = p[3][-1]
+    result = check_types(op, left_type, right_type)
+    p[0] = ("binop", op, p[1], p[3], result)
 
 def p_EXP_term(p):
     '''EXP : TERMINO'''
@@ -197,7 +240,10 @@ def p_TERMINO_sign(p):
     '''TERMINO : TERMINO MULT FACTOR
                | TERMINO DIVIDE FACTOR'''
     op = '*' if p[2] == '*' else '/'
-    p[0] = ("binop", op, p[1], p[3])
+    left_type = p[1][-1]
+    right_type = p[3][-1]
+    result = check_types(op, left_type, right_type)
+    p[0] = ("binop", op, p[1], p[3], result)
 
 def p_TERMINO_factor(p):
     '''TERMINO : FACTOR'''
@@ -228,14 +274,28 @@ def p_skipID(p):
     '''skipID : ID
               | CTE'''
     if p.slice[1].type == 'ID':
-        p[0] = ("id", p[1])
+        var_type = get_var_type(p[1])
+        p[0] = ("id", p[1], var_type)
     else:
-        p[0] = p[1]
+        if p[1][0] == "cte_ent":
+            p[0] = (p[1][0], p[1][1], 'entero')
+        else:
+            p[0] = (p[1][0], p[1][1], 'flotante')
 
 # ----- 12. LLAMADA -----
 def p_LLAMADA(p):
     '''LLAMADA : ID LEFTPAREN args RIGHTPAREN'''
-    p[0] = ('LLAMADA', p[1], p[3])
+    func = dir_funcs.get_funcs(p[1])
+    if not func:
+        raise SemanticError(f"Function '{p[1]}' not declared")
+    if len(p[3]) != len(func.param_types):
+        raise SemanticError(f"Function '{p[1]}' expects {len(func.param_types)} arguments, got {len(p[3])}")
+    
+    for (arg, expected_type) in zip(p[3], func.param_types):
+        arg_type = arg[-1]
+        check_types('=', expected_type, arg_type)
+        
+    p[0] = ('LLAMADA', p[1], p[3], func.return_type)
 
 def p_args(p):
     '''args :

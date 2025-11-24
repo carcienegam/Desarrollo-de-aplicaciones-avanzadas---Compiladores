@@ -1,3 +1,5 @@
+from semantics import SemanticError
+
 INT = 'entero'
 FLOAT = 'flotante'
 BOOL = 'bool'
@@ -56,3 +58,9 @@ semantic_cube = {
         STRING: {STRING: STRING},
     }
 }
+
+def check_types(op, left_type, right_type):
+    try:
+        return semantic_cube[op][left_type][right_type]
+    except KeyError:
+        raise SemanticError(f"Invalid operation: {left_type} {op} {right_type}")
