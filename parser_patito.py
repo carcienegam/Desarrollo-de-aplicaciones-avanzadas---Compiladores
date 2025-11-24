@@ -1,6 +1,8 @@
 import ply.yacc as yacc
 from lex_patito import tokens, build_lexer
 
+from semantics import FuncDirectory, SemanticError, tipo_to_str, function_directory
+
 lexer = build_lexer()
 
 precedence = (
@@ -11,10 +13,23 @@ precedence = (
 
 start = 'programa'
 
+dir_funcs = FuncDirectory()
+
 # ----- 1. Programa -----
 def p_programa(p):
     '''programa : PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN'''
-    p[0] = ('programa', p[2], p[4], p[5], p[7])
+    prog_name = p[2]
+
+    global_func = dir_funcs.add_function('global', 'nula')
+
+    global_vars = p[4]
+    if global_vars is not None:
+        tag, decls = global_vars
+        for (_, name, tipo) in decls:
+            var_type = tipo_to_str(tipo)
+            global_func.var_table.add_variable(name, var_type, kind='var')
+
+    p[0] = ('programa', prog_name, p[4], p[5], p[7])
 
 def p_skipVars(p):
     '''skipVars :
@@ -71,7 +86,26 @@ def p_TIPO(p):
 # ----- 5. Funciones -----
 def p_FUNCS(p):
     '''FUNCS : typeNull ID LEFTPAREN p_Follow RIGHTPAREN LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON'''
-    p[0] = ('FUNCS', p[1], p[2], p[4], p[7], p[8])
+
+    return_type = tipo_to_str(p[1])
+    func_name = p[2]
+
+    func_info = dir_funcs.add_function(func_name, return_type)
+
+    params = p[4]
+    for param_name, tipo in params:
+        param_type = tipo_to_str(tipo)
+        func_info.add_parameter(param_name, param_type)
+
+    local_vars = p[7]
+    if local_vars is not None:
+        tag, decls = local_vars
+        for (_, name, tipo) in decls:
+            var_type = tipo_to_str(tipo)
+            func_info.var_table.add_variable(name, var_type, kind='var')
+
+    p[0] = ('FUNCS', p[1], func_name, p[4], p[7], p[8])
+
 
 def p_typeNull(p):
     '''typeNull : NULA
@@ -298,11 +332,31 @@ parser = yacc.yacc()
 if __name__ == "__main__":
     data = """
     programa p;
+    vars
+        x, y : entero;
+        z : flotante;
+
+    entero suma(a : entero, b : entero) {
+        {
+            escribe(a + b);
+        }
+    };
+    nula foo() {
+        {
+            escribe("en foo");
+        }
+    };
     inicio {
-        x = + * 3;
+        x = 3;
+        y = x + 5;
+        z = 1.5;
+        suma(x, y);
+        foo();
     }
     fin
     """
     result = parser.parse(data, lexer=lexer)
     print("AST:")
     print(result)
+
+    function_directory(dir_funcs)
