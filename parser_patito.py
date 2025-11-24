@@ -4,6 +4,8 @@ from lex_patito import tokens, build_lexer
 from semantics import FuncDirectory, SemanticError, tipo_to_str, function_directory
 from semantic_cube import check_types
 
+from quads import QuadManager
+
 lexer = build_lexer()
 
 precedence = (
@@ -19,6 +21,9 @@ dir_funcs = FuncDirectory()
 current_function = None
 dir_funcs.add_function("global", "nula")
 
+quad_manager = QuadManager()
+
+# ----- Helper Functions -----
 def get_var_type(name):
     if current_function and dir_funcs.exists(current_function):
         t = dir_funcs.get_funcs(current_function).var_table.get_vars(name)
@@ -31,21 +36,56 @@ def get_var_type(name):
 
     raise SemanticError(f"Variable '{name}' not declared")
 
+def binop_cuadruplo(op):
+    # Cuadruplos para operaciones binarias (+, -, *, /)
+    right = quad_manager.pila_operandos.pop()
+    right_type = quad_manager.pila_tipos.pop()
+    left = quad_manager.pila_operandos.pop()
+    left_type = quad_manager.pila_tipos.pop()
+
+    result_type = check_types(op, left_type, right_type)
+    temporal = quad_manager.new_temporal()
+    quad_manager.add_cuadruplo(op, left, right, temporal)
+
+    quad_manager.pila_operandos.push(temporal)
+    quad_manager.pila_tipos.push(result_type)
+
+    return ('temp', temporal, result_type)
+
+def relop_cuadruplo(op):
+    # Cuadruplos para operaciones relacionales (<, >, ==, !=)
+    right = quad_manager.pila_operandos.pop()
+    right_type = quad_manager.pila_tipos.pop()
+    left = quad_manager.pila_operandos.pop()
+    left_type = quad_manager.pila_tipos.pop()
+
+    result_type = check_types(op, left_type, right_type)
+    temporal = quad_manager.new_temporal()
+    quad_manager.add_cuadruplo(op, left, right, temporal)
+
+    quad_manager.pila_operandos.push(temporal)
+    quad_manager.pila_tipos.push(result_type)
+
+    return ('temp', temporal, result_type)
+
+def unminus_cuadruplo(op):
+    # Cuadruplos para operación unaria (-)
+    operand = quad_manager.pila_operandos.pop()
+    operand_type = quad_manager.pila_tipos.pop()
+
+    temporal = quad_manager.new_temporal()
+    quad_manager.add_cuadruplo('uminus', operand, None, temporal)
+
+    quad_manager.pila_operandos.push(temporal)
+    quad_manager.pila_tipos.push(operand_type)
+
+    return ('temp', temporal, operand_type)
+
+
 # ----- 1. Programa -----
 def p_programa(p):
     '''programa : PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN'''
-    prog_name = p[2]
-
-    # global_func = dir_funcs.add_function("global")
-
-    # global_vars = p[4]
-    # if global_vars is not None:
-    #     tag, decls = global_vars
-    #     for (_, name, tipo) in decls:
-    #         var_type = tipo_to_str(tipo)
-    #         global_func.var_table.add_variable(name, var_type, kind='var')
-
-    p[0] = ('programa', prog_name, p[4], p[5], p[7])
+    p[0] = ('programa', p[2], p[4], p[5], p[7])
 
 def p_skipVars(p):
     '''skipVars :
@@ -93,8 +133,13 @@ def p_ASIGNA(p):
     '''ASIGNA : ID ASSIGN EXPRESION SEMICOLON'''
     left_type = get_var_type(p[1])
     right_type = p[3][-1]
-    result = check_types('=', left_type, right_type)
-    p[0] = ('ASIGNA', p[1], p[3], result)
+    check_types('=', left_type, right_type)
+
+    _, address, _ = p[3]
+
+    quad_manager.add_cuadruplo('=', address, None, p[1])
+
+    p[0] = ('ASIGNA', p[1], p[3], left_type)
 
 # ----- 4. CTE -----
 def p_CTE_ent(p):
@@ -199,8 +244,7 @@ def p_EXPRESION(p):
     if p[2] is None:
         p[0] = p[1]
     else:
-        op, right = p[2]
-        p[0] = ("relop", op, p[1], right)
+        p[0] = p[2]
 
 def p_signsExp(p):
     '''signsExp :
@@ -219,17 +263,17 @@ def p_signsExp(p):
             op = '!='
         else:
             op = '=='
-        p[0] = (op, p[2])
+
+        expr = relop_cuadruplo(op)
+        p[0] = expr
 
 # ----- 8. EXP -----
 def p_EXP_sign(p):
     '''EXP : EXP PLUS TERMINO
            | EXP MINUS TERMINO'''
-    op = p[2]
-    left_type = p[1][-1]
-    right_type = p[3][-1]
-    result = check_types(op, left_type, right_type)
-    p[0] = ("binop", op, p[1], p[3], result)
+    op = '+' if p[2] == '+' else '-'
+    expr = binop_cuadruplo(op)
+    p[0] = expr
 
 def p_EXP_term(p):
     '''EXP : TERMINO'''
@@ -240,10 +284,8 @@ def p_TERMINO_sign(p):
     '''TERMINO : TERMINO MULT FACTOR
                | TERMINO DIVIDE FACTOR'''
     op = '*' if p[2] == '*' else '/'
-    left_type = p[1][-1]
-    right_type = p[3][-1]
-    result = check_types(op, left_type, right_type)
-    p[0] = ("binop", op, p[1], p[3], result)
+    expr = binop_cuadruplo(op)
+    p[0] = expr
 
 def p_TERMINO_factor(p):
     '''TERMINO : FACTOR'''
@@ -264,7 +306,8 @@ def p_FACTOR_plus(p):
 
 def p_FACTOR_minus(p):
     '''FACTOR : MINUS skipID'''
-    p[0] = ("unop", '-', p[2])
+    expr = unminus_cuadruplo()
+    p[0] = expr
 
 def p_FACTOR_simple(p):
     '''FACTOR : skipID'''
@@ -275,12 +318,20 @@ def p_skipID(p):
               | CTE'''
     if p.slice[1].type == 'ID':
         var_type = get_var_type(p[1])
+
+        quad_manager.pila_operandos.push(p[1])
+        quad_manager.pila_tipos.push(var_type)
+
         p[0] = ("id", p[1], var_type)
     else:
-        if p[1][0] == "cte_ent":
-            p[0] = (p[1][0], p[1][1], 'entero')
-        else:
-            p[0] = (p[1][0], p[1][1], 'flotante')
+        kind, value = p[1]
+        const_type = 'entero' if kind == 'cte_ent' else 'flotante'
+
+        quad_manager.pila_operandos.push(value)
+        quad_manager.pila_tipos.push(const_type)
+
+        p[0] = ("cte", value, const_type)
+            
 
 # ----- 12. LLAMADA -----
 def p_LLAMADA(p):
@@ -343,13 +394,23 @@ def p_cycleP_VARS(p):
 # ----- 14. IMPRIME -----
 def p_IMPRIME(p):
     '''IMPRIME : ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON'''
-    p[0] = ('IMPRIME', [p[3]] + p[4])
+    items = [p[3]] + p[4]
+
+    for item in items:
+        kind = item[0]
+        if kind == 'letrero':
+            value = item[1]
+        else:
+            value = item[1]
+
+        quad_manager.add_cuadruplo('IMPRIME', value, None, None)
+    p[0] = ('IMPRIME', items)
 
 def p_imp(p):
     '''imp : LETRERO
            | EXPRESION'''
     if p.slice[1].type == 'LETRERO':
-        p[0] = ("letrero", p[1])
+        p[0] = ("letrero", p[1], 'letrero')
     else:
         p[0] = p[1]
 
@@ -393,30 +454,17 @@ if __name__ == "__main__":
     data = """
     programa p;
     vars
-        x, y : entero;
-        z : flotante;
-
-    entero suma(a : entero, b : entero) {
-        {
-            escribe(a + b);
-        }
-    };
-    nula foo() {
-        {
-            escribe("en foo");
-        }
-    };
+        x : entero;
     inicio {
-        x = 3;
-        y = x + 5;
-        z = 1.5;
-        suma(x, y);
-        foo();
+        escribe("Valor de x: ", x, " doble: ", x * 2);
     }
-    fin
+
     """
     result = parser.parse(data, lexer=lexer)
     print("AST:")
     print(result)
 
     function_directory(dir_funcs)
+
+    print("\nCuádruplos:")
+    quad_manager.print_cuadruplos()
