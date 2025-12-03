@@ -1,6 +1,6 @@
 from semantics import vm
 
-class EmptyStackError(Exception):
+class EmptyStackError(Exception): # Detecta pops o tops de pilas vacias
     pass
 
 class Stack:
@@ -32,10 +32,10 @@ class Stack:
     
 class Quadruple:
     def __init__(self, op, left_op=None, right_op=None, result=None):
-        self.op = op
-        self.left_op = left_op
-        self.right_op = right_op
-        self.result = result
+        self.op = op # operacion
+        self.left_op = left_op # operando izquierdo
+        self.right_op = right_op # operandod derecho
+        self.result = result # direccion donde se guarda el resultado
 
     def __repr__(self):
         return f"({self.op}, {self.left_op}, {self.right_op}, {self.result})"    
@@ -43,10 +43,10 @@ class Quadruple:
 
 class QuadManager():
     def __init__(self):
-        self.pila_operandos = Stack("pila_operandos")
-        self.pila_operadores = Stack("pila_operadores")
-        self.pila_tipos = Stack("pila_tipos")
-        self.pila_saltos = Stack("pila_saltos")
+        self.pila_operandos = Stack("pila_operandos") # direcciones
+        self.pila_operadores = Stack("pila_operadores") # simbolos (+, *, -, ...)
+        self.pila_tipos = Stack("pila_tipos") # tipos (int, float, bool)
+        self.pila_saltos = Stack("pila_saltos") # para goto/gotof
 
         self.cuadruplos = [] # Lista de cuadruplos
 
@@ -58,7 +58,7 @@ class QuadManager():
         address = vm.allocate_temporal(tipo)
         return address
     
-        
+    # Añade un cuadruplo a la lista y regresa su indice
     def add_cuadruplo(self, op, left_op=None, right_op=None, result=None):
         cuadruplo = Quadruple(op, left_op, right_op, result)
         self.cuadruplos.append(cuadruplo)

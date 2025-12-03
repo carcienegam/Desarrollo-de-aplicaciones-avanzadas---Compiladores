@@ -3,7 +3,7 @@ import ply.lex as lex
 # Palabras reservadas
 reserved = {
     'programa' : 'PROGRAMA',
-    'start'   : 'START',
+    'main'   : 'MAIN',
     'end'      : 'END',
     'vars'     : 'VARS',
     'int'   : 'INT',

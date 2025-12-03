@@ -8,25 +8,18 @@ from quads import QuadManager
 
 lexer = build_lexer()
 
-# precedence = (
-#     ('left', 'GREATERTHAN', 'LESSTHAN', 'EQUAL', 'NOTEQ'),
-#     ('left', 'PLUS', 'MINUS'),
-#     ('left', 'MULT', 'DIVIDE'),
-# )
-
-start = 'programa'
-
-dir_funcs = FuncDirectory()
-
-current_function = None
+dir_funcs = FuncDirectory() # directorio global de funciones
+current_function = None 
 dir_funcs.add_function("global", "nula")
 current_func_call = None # FunctionInfo de la funcion que estoy llamando
-current_param_idx = 0 # Index de param actual
+current_param_idx = 0 # Index de param actual (P1, P2, P3, ...)
 
-quad_manager = QuadManager()
+quad_manager = QuadManager() # para guardar las pilas y cuadruplos
 
 # ----- Helper Functions -----
+
 def get_var_type(name):
+    # Busca el tipo de una variable por nombre
     if current_function and dir_funcs.exists(current_function):
         t = dir_funcs.get_funcs(current_function).var_table.get_vars(name)
         if t:
@@ -39,6 +32,7 @@ def get_var_type(name):
     raise SemanticError(f"Variable '{name}' not declared")
 
 def get_var_info(name):
+    # Returns VariableInfo completo, busca por nombre
     if current_function and dir_funcs.exists(current_function):
         t = dir_funcs.get_funcs(current_function).var_table.get_vars(name)
         if t:
@@ -57,10 +51,11 @@ def binop_cuadruplo(op):
     left = quad_manager.pila_operandos.pop()
     left_type = quad_manager.pila_tipos.pop()
 
-    result_type = check_types(op, left_type, right_type)
-    temporal_address = quad_manager.new_temporal(result_type)
-    quad_manager.add_cuadruplo(op, left, right, temporal_address)
+    result_type = check_types(op, left_type, right_type) # Valida tipos y obtiene tipo de res
+    temporal_address = quad_manager.new_temporal(result_type) # Crea temp donde se guarda res
+    quad_manager.add_cuadruplo(op, left, right, temporal_address) 
 
+    # Volver a apilar resultado
     quad_manager.pila_operandos.push(temporal_address)
     quad_manager.pila_tipos.push(result_type)
 
@@ -72,11 +67,6 @@ def relop_cuadruplo(op):
     right_type = quad_manager.pila_tipos.pop()
     left = quad_manager.pila_operandos.pop()
     left_type = quad_manager.pila_tipos.pop()
-
-    print("\nDEBUG relop:")
-    print(" left:", left, left_type)
-    print(" right:", right, right_type)
-
 
     result_type = check_types(op, left_type, right_type)
     temporal_address = quad_manager.new_temporal(result_type)
@@ -100,31 +90,34 @@ def unminus_cuadruplo():
 
     return ('temp', temporal_address, operand_type)
 
+start = 'programa'
 
 # ----- 1. Programa -----
 def p_programa_start(p):
     '''program_start : PROGRAMA'''
     global quad_manager, dir_funcs
+
+    # Asegurar que existe la funcion global
     if dir_funcs.get_funcs('global') is None:
         dir_funcs.add_function('global', 'nula')
 
+    # Genera un cuadruplo temporal GOTO para el GOTO main de despues
     p.parser.goto_main_idx = quad_manager.add_cuadruplo('GOTO', None, None, None)
 
 def p_main_start(p):
-    '''main_start : START'''
+    '''main_start : MAIN''' #starts cuando ve el 'main'
     global dir_funcs, vm, quad_manager
-    vm.reset_temporals()
+    vm.reset_temporals() # reset temporales 
 
-    dir_funcs.get_funcs('global').start_quad = len(quad_manager.cuadruplos)
+    dir_funcs.get_funcs('global').start_quad = len(quad_manager.cuadruplos) # index primer cuadruplo del main
 
 
 def p_programa(p):
     '''programa : program_start ID SEMICOLON skipVars cycleFuncs main_start CUERPO END'''
     global dir_funcs, quad_manager
 
-    main_start = dir_funcs.get_funcs('global').start_quad
-
-    quad_manager.fill_cuadruplos(p.parser.goto_main_idx, main_start)
+    main_start = dir_funcs.get_funcs('global').start_quad # cuadruplo de main
+    quad_manager.fill_cuadruplos(p.parser.goto_main_idx, main_start) # rellena cuadruplo main c/dirrecion
 
     quad_manager.add_cuadruplo('END', None, None, None)
 
@@ -139,11 +132,13 @@ def p_skipVars(p):
         vars_ast = p[1]
         tag, decls = vars_ast
 
+        # Decide en que scope se van a guardarl las variables
         if current_function and dir_funcs.exists(current_function):
-            func_info = dir_funcs.get_funcs(current_function)
+            func_info = dir_funcs.get_funcs(current_function) # Locales
         else:
-            func_info = dir_funcs.get_funcs("global")
+            func_info = dir_funcs.get_funcs("global") # Globales
 
+        # Recorre y mete en la variable table adecuada
         for (_, name, tipo) in decls:
             var_type = tipo_to_str(tipo)
             func_info.var_table.add_variable(name, var_type, kind='var')
@@ -669,7 +664,7 @@ if __name__ == "__main__":
         }
     };
 
-    start {
+    main {
         i = 2;
         j = i * 2 - 1;
         uno(j);

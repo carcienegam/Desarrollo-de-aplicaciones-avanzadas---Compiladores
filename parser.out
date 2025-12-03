@@ -4,7 +4,7 @@ Grammar
 
 Rule 0     S' -> programa
 Rule 1     program_start -> PROGRAMA
-Rule 2     main_start -> START
+Rule 2     main_start -> MAIN
 Rule 3     programa -> program_start ID SEMICOLON skipVars cycleFuncs main_start CUERPO END
 Rule 4     skipVars -> <empty>
 Rule 5     skipVars -> VARS_sect
@@ -105,6 +105,7 @@ LEFTBRACKET          : 31
 LEFTPAREN            : 16 45 52 65 70 74 75
 LESSTHAN             : 36
 LETRERO              : 66
+MAIN                 : 2
 MINUS                : 40 48
 MULT                 : 42
 NOTEQ                : 38
@@ -117,7 +118,6 @@ RIGHTBRACE           : 8 17
 RIGHTBRACKET         : 31
 RIGHTPAREN           : 16 45 52 65 70 74 75
 SEMICOLON            : 3 11 17 29 32 60 65 70 74 75
-START                : 2
 VARS                 : 59
 WHILE                : 70
 error                : 
@@ -220,7 +220,7 @@ state 5
     NULA            reduce using rule 4 (skipVars -> .)
     INT             reduce using rule 4 (skipVars -> .)
     FLOAT           reduce using rule 4 (skipVars -> .)
-    START           reduce using rule 4 (skipVars -> .)
+    MAIN            reduce using rule 4 (skipVars -> .)
     VARS            shift and go to state 8
 
     skipVars                       shift and go to state 6
@@ -238,7 +238,7 @@ state 6
     (14) TIPO -> . INT
     (15) TIPO -> . FLOAT
 
-    START           reduce using rule 6 (cycleFuncs -> .)
+    MAIN            reduce using rule 6 (cycleFuncs -> .)
     NULA            shift and go to state 13
     INT             shift and go to state 15
     FLOAT           shift and go to state 16
@@ -256,7 +256,7 @@ state 7
     NULA            reduce using rule 5 (skipVars -> VARS_sect .)
     INT             reduce using rule 5 (skipVars -> VARS_sect .)
     FLOAT           reduce using rule 5 (skipVars -> VARS_sect .)
-    START           reduce using rule 5 (skipVars -> VARS_sect .)
+    MAIN            reduce using rule 5 (skipVars -> VARS_sect .)
     LEFTBRACE       reduce using rule 5 (skipVars -> VARS_sect .)
 
 
@@ -272,9 +272,9 @@ state 8
 state 9
 
     (3) programa -> program_start ID SEMICOLON skipVars cycleFuncs . main_start CUERPO END
-    (2) main_start -> . START
+    (2) main_start -> . MAIN
 
-    START           shift and go to state 20
+    MAIN            shift and go to state 20
 
     main_start                     shift and go to state 19
 
@@ -290,7 +290,7 @@ state 10
     (14) TIPO -> . INT
     (15) TIPO -> . FLOAT
 
-    START           reduce using rule 6 (cycleFuncs -> .)
+    MAIN            reduce using rule 6 (cycleFuncs -> .)
     NULA            shift and go to state 13
     INT             shift and go to state 15
     FLOAT           shift and go to state 16
@@ -356,7 +356,7 @@ state 17
     NULA            reduce using rule 59 (VARS_sect -> VARS p_VARS .)
     INT             reduce using rule 59 (VARS_sect -> VARS p_VARS .)
     FLOAT           reduce using rule 59 (VARS_sect -> VARS p_VARS .)
-    START           reduce using rule 59 (VARS_sect -> VARS p_VARS .)
+    MAIN            reduce using rule 59 (VARS_sect -> VARS p_VARS .)
     LEFTBRACE       reduce using rule 59 (VARS_sect -> VARS p_VARS .)
 
 
@@ -382,16 +382,16 @@ state 19
 
 state 20
 
-    (2) main_start -> START .
+    (2) main_start -> MAIN .
 
-    LEFTBRACE       reduce using rule 2 (main_start -> START .)
+    LEFTBRACE       reduce using rule 2 (main_start -> MAIN .)
 
 
 state 21
 
     (7) cycleFuncs -> FUNCS cycleFuncs .
 
-    START           reduce using rule 7 (cycleFuncs -> FUNCS cycleFuncs .)
+    MAIN            reduce using rule 7 (cycleFuncs -> FUNCS cycleFuncs .)
 
 
 state 22
@@ -1203,7 +1203,7 @@ state 76
     NULA            reduce using rule 63 (cycleP_VARS -> .)
     INT             reduce using rule 63 (cycleP_VARS -> .)
     FLOAT           reduce using rule 63 (cycleP_VARS -> .)
-    START           reduce using rule 63 (cycleP_VARS -> .)
+    MAIN            reduce using rule 63 (cycleP_VARS -> .)
     LEFTBRACE       reduce using rule 63 (cycleP_VARS -> .)
     ID              shift and go to state 18
 
@@ -1698,7 +1698,7 @@ state 101
     NULA            reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
     INT             reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
     FLOAT           reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
-    START           reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
+    MAIN            reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
     LEFTBRACE       reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
 
 
@@ -1709,7 +1709,7 @@ state 102
     NULA            reduce using rule 64 (cycleP_VARS -> p_VARS .)
     INT             reduce using rule 64 (cycleP_VARS -> p_VARS .)
     FLOAT           reduce using rule 64 (cycleP_VARS -> p_VARS .)
-    START           reduce using rule 64 (cycleP_VARS -> p_VARS .)
+    MAIN            reduce using rule 64 (cycleP_VARS -> p_VARS .)
     LEFTBRACE       reduce using rule 64 (cycleP_VARS -> p_VARS .)
 
 
@@ -2089,7 +2089,7 @@ state 130
     NULA            reduce using rule 17 (FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .)
     INT             reduce using rule 17 (FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .)
     FLOAT           reduce using rule 17 (FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .)
-    START           reduce using rule 17 (FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .)
+    MAIN            reduce using rule 17 (FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .)
 
 
 state 131
