@@ -1,7 +1,7 @@
 from semantics import SemanticError
 
-INT = 'entero'
-FLOAT = 'flotante'
+INT = 'int'
+FLOAT = 'float'
 BOOL = 'bool'
 STRING = 'letrero'
 

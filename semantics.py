@@ -7,10 +7,10 @@ class SemanticError(Exception):
 class VirtualMemory:
     def __init__(self):
         self.memory = {
-            'global': {'entero': 1000, 'flotante': 2000, 'bool': 3000},
-            'local': {'entero': 4000, 'flotante': 5000, 'bool': 6000},
-            'temporal': {'entero': 7000, 'flotante': 8000, 'bool': 9000},
-            'const': {'entero': 10000, 'flotante': 11000, 'letrero': 12000}
+            'global': {'int': 1000, 'float': 2000, 'bool': 3000},
+            'local': {'int': 4000, 'float': 5000, 'bool': 6000},
+            'temporal': {'int': 7000, 'float': 8000, 'bool': 9000},
+            'const': {'int': 10000, 'float': 11000, 'letrero': 12000}
         }
 
         self.counters = {
@@ -19,8 +19,8 @@ class VirtualMemory:
         }
 
         self.const_tables = {
-            'entero': {},
-            'flotante': {},
+            'int': {},
+            'float': {},
             'letrero': {}
         }
 
@@ -56,6 +56,9 @@ class VirtualMemory:
         self.counters[segment][const_type] += 1
         table[value] = address
         return address
+    
+    def reset_temporals(self):
+        self.counters['temporal'] = {tipo: 0 for tipo in self.counters['temporal']}
         
 vm = VirtualMemory()
 
@@ -100,6 +103,7 @@ class FunctionInfo:
         self.param_types = []
         self.var_table = VariableTable(name)
         self.start_quad = None
+        self.return_address = None
 
     def add_parameter(self, name, param_type):
         self.param_names.append(name)
@@ -116,9 +120,14 @@ class FuncDirectory:
     def add_function(self, name, return_type):
         if name in self.functions:
             raise SemanticError(f"Function '{name}' already declared")
-        self.functions[name] = FunctionInfo(name, return_type)
+        
+        func = FunctionInfo(name, return_type)
+        self.functions[name] = func
 
-        return self.functions[name]
+        if return_type is not None and return_type != 'nula':
+            func.return_address = vm.allocate_variable('global', return_type)
+
+        return func
 
     def get_funcs(self, name):
         return self.functions.get(name)

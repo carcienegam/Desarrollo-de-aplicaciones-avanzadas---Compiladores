@@ -3,169 +3,185 @@ Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 Grammar
 
 Rule 0     S' -> programa
-Rule 1     programa -> PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN
-Rule 2     skipVars -> <empty>
-Rule 3     skipVars -> VARS_sect
-Rule 4     cycleFuncs -> <empty>
-Rule 5     cycleFuncs -> FUNCS cycleFuncs
-Rule 6     CUERPO -> LEFTBRACE cycleEst RIGHTBRACE
-Rule 7     cycleEst -> <empty>
-Rule 8     cycleEst -> ESTATUTO cycleEst
-Rule 9     ASIGNA -> ID ASSIGN EXPRESION SEMICOLON
-Rule 10    CTE -> CTE_ENT
-Rule 11    CTE -> CTE_FLOAT
-Rule 12    TIPO -> ENTERO
-Rule 13    TIPO -> FLOTANTE
-Rule 14    funcsHeader -> typeNull ID LEFTPAREN p_Follow RIGHTPAREN
-Rule 15    FUNCS -> funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON
-Rule 16    typeNull -> NULA
-Rule 17    typeNull -> TIPO
-Rule 18    p_Follow -> <empty>
-Rule 19    p_Follow -> ID COLON TIPO commaCycleFuncs
-Rule 20    commaCycleFuncs -> <empty>
-Rule 21    commaCycleFuncs -> COMMA p_Follow
-Rule 22    ESTATUTO -> ASIGNA
-Rule 23    ESTATUTO -> CONDICION
-Rule 24    ESTATUTO -> CICLO
-Rule 25    ESTATUTO -> LLAMADA SEMICOLON
-Rule 26    ESTATUTO -> IMPRIME
-Rule 27    ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET
-Rule 28    EXPRESION -> EXP signsExp
-Rule 29    signsExp -> <empty>
-Rule 30    signsExp -> GREATERTHAN EXP
-Rule 31    signsExp -> LESSTHAN EXP
-Rule 32    signsExp -> EQUAL EXP
-Rule 33    signsExp -> NOTEQ EXP
-Rule 34    EXP -> EXP PLUS TERMINO
-Rule 35    EXP -> EXP MINUS TERMINO
-Rule 36    EXP -> TERMINO
-Rule 37    TERMINO -> TERMINO MULT FACTOR
-Rule 38    TERMINO -> TERMINO DIVIDE FACTOR
-Rule 39    TERMINO -> FACTOR
-Rule 40    FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN
-Rule 41    FACTOR -> LLAMADA
-Rule 42    FACTOR -> PLUS skipID
-Rule 43    FACTOR -> MINUS skipID
-Rule 44    FACTOR -> skipID
-Rule 45    skipID -> ID
-Rule 46    skipID -> CTE
-Rule 47    LLAMADA -> ID LEFTPAREN args RIGHTPAREN
-Rule 48    args -> <empty>
-Rule 49    args -> EXPRESION argsCycle
-Rule 50    argsCycle -> <empty>
-Rule 51    argsCycle -> COMMA EXPRESION argsCycle
-Rule 52    VARS_sect -> VARS p_VARS
-Rule 53    p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS
-Rule 54    cycleID -> <empty>
-Rule 55    cycleID -> COMMA ID cycleID
-Rule 56    cycleP_VARS -> <empty>
-Rule 57    cycleP_VARS -> p_VARS
-Rule 58    IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
-Rule 59    imp -> LETRERO
-Rule 60    imp -> EXPRESION
-Rule 61    cycleImp -> <empty>
-Rule 62    cycleImp -> COMMA imp cycleImp
-Rule 63    CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
-Rule 64    ciclo_start -> <empty>
-Rule 65    ciclo_goToF -> <empty>
-Rule 66    ciclo_end -> <empty>
-Rule 67    CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
-Rule 68    CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
-Rule 69    if_goToF -> <empty>
-Rule 70    if_noElse -> <empty>
-Rule 71    if_else -> <empty>
-Rule 72    if_else_end -> <empty>
+Rule 1     program_start -> PROGRAMA
+Rule 2     main_start -> START
+Rule 3     programa -> program_start ID SEMICOLON skipVars cycleFuncs main_start CUERPO END
+Rule 4     skipVars -> <empty>
+Rule 5     skipVars -> VARS_sect
+Rule 6     cycleFuncs -> <empty>
+Rule 7     cycleFuncs -> FUNCS cycleFuncs
+Rule 8     CUERPO -> LEFTBRACE cycleEst RIGHTBRACE
+Rule 9     cycleEst -> <empty>
+Rule 10    cycleEst -> ESTATUTO cycleEst
+Rule 11    ASIGNA -> ID ASSIGN EXPRESION SEMICOLON
+Rule 12    CTE -> CTE_INT
+Rule 13    CTE -> CTE_FLOAT
+Rule 14    TIPO -> INT
+Rule 15    TIPO -> FLOAT
+Rule 16    funcsHeader -> typeNull ID LEFTPAREN p_Follow RIGHTPAREN
+Rule 17    FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON
+Rule 18    func_start -> <empty>
+Rule 19    func_end -> <empty>
+Rule 20    typeNull -> NULA
+Rule 21    typeNull -> TIPO
+Rule 22    p_Follow -> <empty>
+Rule 23    p_Follow -> ID COLON TIPO commaCycleFuncs
+Rule 24    commaCycleFuncs -> <empty>
+Rule 25    commaCycleFuncs -> COMMA p_Follow
+Rule 26    ESTATUTO -> ASIGNA
+Rule 27    ESTATUTO -> CONDICION
+Rule 28    ESTATUTO -> CICLO
+Rule 29    ESTATUTO -> LLAMADA SEMICOLON
+Rule 30    ESTATUTO -> IMPRIME
+Rule 31    ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET
+Rule 32    ESTATUTO -> RETURN EXPRESION SEMICOLON
+Rule 33    EXPRESION -> EXP signsExp
+Rule 34    signsExp -> <empty>
+Rule 35    signsExp -> GREATERTHAN EXP
+Rule 36    signsExp -> LESSTHAN EXP
+Rule 37    signsExp -> EQUAL EXP
+Rule 38    signsExp -> NOTEQ EXP
+Rule 39    EXP -> EXP PLUS TERMINO
+Rule 40    EXP -> EXP MINUS TERMINO
+Rule 41    EXP -> TERMINO
+Rule 42    TERMINO -> TERMINO MULT FACTOR
+Rule 43    TERMINO -> TERMINO DIVIDE FACTOR
+Rule 44    TERMINO -> FACTOR
+Rule 45    FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN
+Rule 46    FACTOR -> LLAMADA
+Rule 47    FACTOR -> PLUS skipID
+Rule 48    FACTOR -> MINUS skipID
+Rule 49    FACTOR -> skipID
+Rule 50    skipID -> ID
+Rule 51    skipID -> CTE
+Rule 52    LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN
+Rule 53    ERA -> <empty>
+Rule 54    args -> <empty>
+Rule 55    args -> arg_item argsCycle
+Rule 56    argsCycle -> <empty>
+Rule 57    argsCycle -> COMMA arg_item argsCycle
+Rule 58    arg_item -> EXPRESION
+Rule 59    VARS_sect -> VARS p_VARS
+Rule 60    p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS
+Rule 61    cycleID -> <empty>
+Rule 62    cycleID -> COMMA ID cycleID
+Rule 63    cycleP_VARS -> <empty>
+Rule 64    cycleP_VARS -> p_VARS
+Rule 65    IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
+Rule 66    imp -> LETRERO
+Rule 67    imp -> EXPRESION
+Rule 68    cycleImp -> <empty>
+Rule 69    cycleImp -> COMMA imp cycleImp
+Rule 70    CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON
+Rule 71    ciclo_start -> <empty>
+Rule 72    ciclo_goToF -> <empty>
+Rule 73    ciclo_end -> <empty>
+Rule 74    CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+Rule 75    CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON
+Rule 76    if_goToF -> <empty>
+Rule 77    if_noElse -> <empty>
+Rule 78    if_else -> <empty>
+Rule 79    if_else_end -> <empty>
 
 Terminals, with rules where they appear
 
-ASSIGN               : 9
-COLON                : 19 53
-COMMA                : 21 51 55 62
-CTE_ENT              : 10
-CTE_FLOAT            : 11
-DIVIDE               : 38
-ENTERO               : 12
-EQUAL                : 32
-ESCRIBE              : 58
-FIN                  : 1
-FLOTANTE             : 13
-GREATERTHAN          : 30
-HAZ                  : 63
-ID                   : 1 9 14 19 45 47 53 55
-INICIO               : 1
-LEFTBRACE            : 6 15
-LEFTBRACKET          : 27
-LEFTPAREN            : 14 40 47 58 63 67 68
-LESSTHAN             : 31
-LETRERO              : 59
-MIENTRAS             : 63
-MINUS                : 35 43
-MULT                 : 37
-NOTEQ                : 33
-NULA                 : 16
-PLUS                 : 34 42
+ASSIGN               : 11
+COLON                : 23 60
+COMMA                : 25 57 62 69
+CTE_FLOAT            : 13
+CTE_INT              : 12
+DIVIDE               : 43
+DO                   : 70
+ELSE                 : 75
+END                  : 3
+EQUAL                : 37
+FLOAT                : 15
+GREATERTHAN          : 35
+ID                   : 3 11 16 23 50 52 60 62
+IF                   : 74 75
+INT                  : 14
+LEFTBRACE            : 8 17
+LEFTBRACKET          : 31
+LEFTPAREN            : 16 45 52 65 70 74 75
+LESSTHAN             : 36
+LETRERO              : 66
+MINUS                : 40 48
+MULT                 : 42
+NOTEQ                : 38
+NULA                 : 20
+PLUS                 : 39 47
+PRINT                : 65
 PROGRAMA             : 1
-RIGHTBRACE           : 6 15
-RIGHTBRACKET         : 27
-RIGHTPAREN           : 14 40 47 58 63 67 68
-SEMICOLON            : 1 9 15 25 53 58 63 67 68
-SI                   : 67 68
-SINO                 : 68
-VARS                 : 52
+RETURN               : 32
+RIGHTBRACE           : 8 17
+RIGHTBRACKET         : 31
+RIGHTPAREN           : 16 45 52 65 70 74 75
+SEMICOLON            : 3 11 17 29 32 60 65 70 74 75
+START                : 2
+VARS                 : 59
+WHILE                : 70
 error                : 
 
 Nonterminals, with rules where they appear
 
-ASIGNA               : 22
-CICLO                : 24
-CONDICION            : 23
-CTE                  : 46
-CUERPO               : 1 15 63 67 68 68
-ESTATUTO             : 8 27
-EXP                  : 28 30 31 32 33 34 35
-EXPRESION            : 9 40 49 51 60 63 67 68
-FACTOR               : 37 38 39
-FUNCS                : 5
-IMPRIME              : 26
-LLAMADA              : 25 41
-TERMINO              : 34 35 36 37 38
-TIPO                 : 17 19 53
-VARS_sect            : 3
-args                 : 47
-argsCycle            : 49 51
-ciclo_end            : 63
-ciclo_goToF          : 63
-ciclo_start          : 63
-commaCycleFuncs      : 19
-cycleEst             : 6 8
-cycleFuncs           : 1 5
-cycleID              : 53 55
-cycleImp             : 58 62
-cycleP_VARS          : 53
-funcsHeader          : 15
-if_else              : 68
-if_else_end          : 68
-if_goToF             : 67 68
-if_noElse            : 67
-imp                  : 58 62
-p_Follow             : 14 21
-p_VARS               : 52 57
+ASIGNA               : 26
+CICLO                : 28
+CONDICION            : 27
+CTE                  : 51
+CUERPO               : 3 17 70 74 75 75
+ERA                  : 52
+ESTATUTO             : 10 31
+EXP                  : 33 35 36 37 38 39 40
+EXPRESION            : 11 32 45 58 67 70 74 75
+FACTOR               : 42 43 44
+FUNCS                : 7
+IMPRIME              : 30
+LLAMADA              : 29 46
+TERMINO              : 39 40 41 42 43
+TIPO                 : 21 23 60
+VARS_sect            : 5
+arg_item             : 55 57
+args                 : 52
+argsCycle            : 55 57
+ciclo_end            : 70
+ciclo_goToF          : 70
+ciclo_start          : 70
+commaCycleFuncs      : 23
+cycleEst             : 8 10
+cycleFuncs           : 3 7
+cycleID              : 60 62
+cycleImp             : 65 69
+cycleP_VARS          : 60
+func_end             : 17
+func_start           : 17
+funcsHeader          : 17
+if_else              : 75
+if_else_end          : 75
+if_goToF             : 74 75
+if_noElse            : 74
+imp                  : 65 69
+main_start           : 3
+p_Follow             : 16 25
+p_VARS               : 59 64
+program_start        : 3
 programa             : 0
-signsExp             : 28
-skipID               : 42 43 44
-skipVars             : 1 15
-typeNull             : 14
+signsExp             : 33
+skipID               : 47 48 49
+skipVars             : 3 17
+typeNull             : 16
 
 Parsing method: LALR
 
 state 0
 
     (0) S' -> . programa
-    (1) programa -> . PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN
+    (3) programa -> . program_start ID SEMICOLON skipVars cycleFuncs main_start CUERPO END
+    (1) program_start -> . PROGRAMA
 
-    PROGRAMA        shift and go to state 2
+    PROGRAMA        shift and go to state 3
 
     programa                       shift and go to state 1
+    program_start                  shift and go to state 2
 
 state 1
 
@@ -175,1944 +191,2075 @@ state 1
 
 state 2
 
-    (1) programa -> PROGRAMA . ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN
+    (3) programa -> program_start . ID SEMICOLON skipVars cycleFuncs main_start CUERPO END
 
-    ID              shift and go to state 3
+    ID              shift and go to state 4
 
 
 state 3
 
-    (1) programa -> PROGRAMA ID . SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN
+    (1) program_start -> PROGRAMA .
 
-    SEMICOLON       shift and go to state 4
+    ID              reduce using rule 1 (program_start -> PROGRAMA .)
 
 
 state 4
 
-    (1) programa -> PROGRAMA ID SEMICOLON . skipVars cycleFuncs INICIO CUERPO FIN
-    (2) skipVars -> .
-    (3) skipVars -> . VARS_sect
-    (52) VARS_sect -> . VARS p_VARS
+    (3) programa -> program_start ID . SEMICOLON skipVars cycleFuncs main_start CUERPO END
 
-    NULA            reduce using rule 2 (skipVars -> .)
-    ENTERO          reduce using rule 2 (skipVars -> .)
-    FLOTANTE        reduce using rule 2 (skipVars -> .)
-    INICIO          reduce using rule 2 (skipVars -> .)
-    VARS            shift and go to state 7
+    SEMICOLON       shift and go to state 5
 
-    skipVars                       shift and go to state 5
-    VARS_sect                      shift and go to state 6
 
 state 5
 
-    (1) programa -> PROGRAMA ID SEMICOLON skipVars . cycleFuncs INICIO CUERPO FIN
-    (4) cycleFuncs -> .
-    (5) cycleFuncs -> . FUNCS cycleFuncs
-    (15) FUNCS -> . funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON
-    (14) funcsHeader -> . typeNull ID LEFTPAREN p_Follow RIGHTPAREN
-    (16) typeNull -> . NULA
-    (17) typeNull -> . TIPO
-    (12) TIPO -> . ENTERO
-    (13) TIPO -> . FLOTANTE
+    (3) programa -> program_start ID SEMICOLON . skipVars cycleFuncs main_start CUERPO END
+    (4) skipVars -> .
+    (5) skipVars -> . VARS_sect
+    (59) VARS_sect -> . VARS p_VARS
 
-    INICIO          reduce using rule 4 (cycleFuncs -> .)
-    NULA            shift and go to state 12
-    ENTERO          shift and go to state 14
-    FLOTANTE        shift and go to state 15
+    NULA            reduce using rule 4 (skipVars -> .)
+    INT             reduce using rule 4 (skipVars -> .)
+    FLOAT           reduce using rule 4 (skipVars -> .)
+    START           reduce using rule 4 (skipVars -> .)
+    VARS            shift and go to state 8
 
-    cycleFuncs                     shift and go to state 8
-    FUNCS                          shift and go to state 9
-    funcsHeader                    shift and go to state 10
-    typeNull                       shift and go to state 11
-    TIPO                           shift and go to state 13
+    skipVars                       shift and go to state 6
+    VARS_sect                      shift and go to state 7
 
 state 6
 
-    (3) skipVars -> VARS_sect .
+    (3) programa -> program_start ID SEMICOLON skipVars . cycleFuncs main_start CUERPO END
+    (6) cycleFuncs -> .
+    (7) cycleFuncs -> . FUNCS cycleFuncs
+    (17) FUNCS -> . funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON
+    (16) funcsHeader -> . typeNull ID LEFTPAREN p_Follow RIGHTPAREN
+    (20) typeNull -> . NULA
+    (21) typeNull -> . TIPO
+    (14) TIPO -> . INT
+    (15) TIPO -> . FLOAT
 
-    NULA            reduce using rule 3 (skipVars -> VARS_sect .)
-    ENTERO          reduce using rule 3 (skipVars -> VARS_sect .)
-    FLOTANTE        reduce using rule 3 (skipVars -> VARS_sect .)
-    INICIO          reduce using rule 3 (skipVars -> VARS_sect .)
-    LEFTBRACE       reduce using rule 3 (skipVars -> VARS_sect .)
+    START           reduce using rule 6 (cycleFuncs -> .)
+    NULA            shift and go to state 13
+    INT             shift and go to state 15
+    FLOAT           shift and go to state 16
 
+    cycleFuncs                     shift and go to state 9
+    FUNCS                          shift and go to state 10
+    funcsHeader                    shift and go to state 11
+    typeNull                       shift and go to state 12
+    TIPO                           shift and go to state 14
 
 state 7
 
-    (52) VARS_sect -> VARS . p_VARS
-    (53) p_VARS -> . ID cycleID COLON TIPO SEMICOLON cycleP_VARS
+    (5) skipVars -> VARS_sect .
 
-    ID              shift and go to state 17
+    NULA            reduce using rule 5 (skipVars -> VARS_sect .)
+    INT             reduce using rule 5 (skipVars -> VARS_sect .)
+    FLOAT           reduce using rule 5 (skipVars -> VARS_sect .)
+    START           reduce using rule 5 (skipVars -> VARS_sect .)
+    LEFTBRACE       reduce using rule 5 (skipVars -> VARS_sect .)
 
-    p_VARS                         shift and go to state 16
 
 state 8
 
-    (1) programa -> PROGRAMA ID SEMICOLON skipVars cycleFuncs . INICIO CUERPO FIN
+    (59) VARS_sect -> VARS . p_VARS
+    (60) p_VARS -> . ID cycleID COLON TIPO SEMICOLON cycleP_VARS
 
-    INICIO          shift and go to state 18
+    ID              shift and go to state 18
 
+    p_VARS                         shift and go to state 17
 
 state 9
 
-    (5) cycleFuncs -> FUNCS . cycleFuncs
-    (4) cycleFuncs -> .
-    (5) cycleFuncs -> . FUNCS cycleFuncs
-    (15) FUNCS -> . funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON
-    (14) funcsHeader -> . typeNull ID LEFTPAREN p_Follow RIGHTPAREN
-    (16) typeNull -> . NULA
-    (17) typeNull -> . TIPO
-    (12) TIPO -> . ENTERO
-    (13) TIPO -> . FLOTANTE
+    (3) programa -> program_start ID SEMICOLON skipVars cycleFuncs . main_start CUERPO END
+    (2) main_start -> . START
 
-    INICIO          reduce using rule 4 (cycleFuncs -> .)
-    NULA            shift and go to state 12
-    ENTERO          shift and go to state 14
-    FLOTANTE        shift and go to state 15
+    START           shift and go to state 20
 
-    FUNCS                          shift and go to state 9
-    cycleFuncs                     shift and go to state 19
-    funcsHeader                    shift and go to state 10
-    typeNull                       shift and go to state 11
-    TIPO                           shift and go to state 13
+    main_start                     shift and go to state 19
 
 state 10
 
-    (15) FUNCS -> funcsHeader . LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON
+    (7) cycleFuncs -> FUNCS . cycleFuncs
+    (6) cycleFuncs -> .
+    (7) cycleFuncs -> . FUNCS cycleFuncs
+    (17) FUNCS -> . funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON
+    (16) funcsHeader -> . typeNull ID LEFTPAREN p_Follow RIGHTPAREN
+    (20) typeNull -> . NULA
+    (21) typeNull -> . TIPO
+    (14) TIPO -> . INT
+    (15) TIPO -> . FLOAT
 
-    LEFTBRACE       shift and go to state 20
+    START           reduce using rule 6 (cycleFuncs -> .)
+    NULA            shift and go to state 13
+    INT             shift and go to state 15
+    FLOAT           shift and go to state 16
 
+    FUNCS                          shift and go to state 10
+    cycleFuncs                     shift and go to state 21
+    funcsHeader                    shift and go to state 11
+    typeNull                       shift and go to state 12
+    TIPO                           shift and go to state 14
 
 state 11
 
-    (14) funcsHeader -> typeNull . ID LEFTPAREN p_Follow RIGHTPAREN
+    (17) FUNCS -> funcsHeader . LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON
 
-    ID              shift and go to state 21
+    LEFTBRACE       shift and go to state 22
 
 
 state 12
 
-    (16) typeNull -> NULA .
+    (16) funcsHeader -> typeNull . ID LEFTPAREN p_Follow RIGHTPAREN
 
-    ID              reduce using rule 16 (typeNull -> NULA .)
+    ID              shift and go to state 23
 
 
 state 13
 
-    (17) typeNull -> TIPO .
+    (20) typeNull -> NULA .
 
-    ID              reduce using rule 17 (typeNull -> TIPO .)
+    ID              reduce using rule 20 (typeNull -> NULA .)
 
 
 state 14
 
-    (12) TIPO -> ENTERO .
+    (21) typeNull -> TIPO .
 
-    ID              reduce using rule 12 (TIPO -> ENTERO .)
-    SEMICOLON       reduce using rule 12 (TIPO -> ENTERO .)
-    COMMA           reduce using rule 12 (TIPO -> ENTERO .)
-    RIGHTPAREN      reduce using rule 12 (TIPO -> ENTERO .)
+    ID              reduce using rule 21 (typeNull -> TIPO .)
 
 
 state 15
 
-    (13) TIPO -> FLOTANTE .
+    (14) TIPO -> INT .
 
-    ID              reduce using rule 13 (TIPO -> FLOTANTE .)
-    SEMICOLON       reduce using rule 13 (TIPO -> FLOTANTE .)
-    COMMA           reduce using rule 13 (TIPO -> FLOTANTE .)
-    RIGHTPAREN      reduce using rule 13 (TIPO -> FLOTANTE .)
+    ID              reduce using rule 14 (TIPO -> INT .)
+    SEMICOLON       reduce using rule 14 (TIPO -> INT .)
+    COMMA           reduce using rule 14 (TIPO -> INT .)
+    RIGHTPAREN      reduce using rule 14 (TIPO -> INT .)
 
 
 state 16
 
-    (52) VARS_sect -> VARS p_VARS .
+    (15) TIPO -> FLOAT .
 
-    NULA            reduce using rule 52 (VARS_sect -> VARS p_VARS .)
-    ENTERO          reduce using rule 52 (VARS_sect -> VARS p_VARS .)
-    FLOTANTE        reduce using rule 52 (VARS_sect -> VARS p_VARS .)
-    INICIO          reduce using rule 52 (VARS_sect -> VARS p_VARS .)
-    LEFTBRACE       reduce using rule 52 (VARS_sect -> VARS p_VARS .)
+    ID              reduce using rule 15 (TIPO -> FLOAT .)
+    SEMICOLON       reduce using rule 15 (TIPO -> FLOAT .)
+    COMMA           reduce using rule 15 (TIPO -> FLOAT .)
+    RIGHTPAREN      reduce using rule 15 (TIPO -> FLOAT .)
 
 
 state 17
 
-    (53) p_VARS -> ID . cycleID COLON TIPO SEMICOLON cycleP_VARS
-    (54) cycleID -> .
-    (55) cycleID -> . COMMA ID cycleID
+    (59) VARS_sect -> VARS p_VARS .
 
-    COLON           reduce using rule 54 (cycleID -> .)
-    COMMA           shift and go to state 23
+    NULA            reduce using rule 59 (VARS_sect -> VARS p_VARS .)
+    INT             reduce using rule 59 (VARS_sect -> VARS p_VARS .)
+    FLOAT           reduce using rule 59 (VARS_sect -> VARS p_VARS .)
+    START           reduce using rule 59 (VARS_sect -> VARS p_VARS .)
+    LEFTBRACE       reduce using rule 59 (VARS_sect -> VARS p_VARS .)
 
-    cycleID                        shift and go to state 22
 
 state 18
 
-    (1) programa -> PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO . CUERPO FIN
-    (6) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
+    (60) p_VARS -> ID . cycleID COLON TIPO SEMICOLON cycleP_VARS
+    (61) cycleID -> .
+    (62) cycleID -> . COMMA ID cycleID
 
-    LEFTBRACE       shift and go to state 25
+    COLON           reduce using rule 61 (cycleID -> .)
+    COMMA           shift and go to state 25
 
-    CUERPO                         shift and go to state 24
+    cycleID                        shift and go to state 24
 
 state 19
 
-    (5) cycleFuncs -> FUNCS cycleFuncs .
+    (3) programa -> program_start ID SEMICOLON skipVars cycleFuncs main_start . CUERPO END
+    (8) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
 
-    INICIO          reduce using rule 5 (cycleFuncs -> FUNCS cycleFuncs .)
+    LEFTBRACE       shift and go to state 27
 
+    CUERPO                         shift and go to state 26
 
 state 20
 
-    (15) FUNCS -> funcsHeader LEFTBRACE . skipVars CUERPO RIGHTBRACE SEMICOLON
-    (2) skipVars -> .
-    (3) skipVars -> . VARS_sect
-    (52) VARS_sect -> . VARS p_VARS
+    (2) main_start -> START .
 
-    LEFTBRACE       reduce using rule 2 (skipVars -> .)
-    VARS            shift and go to state 7
+    LEFTBRACE       reduce using rule 2 (main_start -> START .)
 
-    skipVars                       shift and go to state 26
-    VARS_sect                      shift and go to state 6
 
 state 21
 
-    (14) funcsHeader -> typeNull ID . LEFTPAREN p_Follow RIGHTPAREN
+    (7) cycleFuncs -> FUNCS cycleFuncs .
 
-    LEFTPAREN       shift and go to state 27
+    START           reduce using rule 7 (cycleFuncs -> FUNCS cycleFuncs .)
 
 
 state 22
 
-    (53) p_VARS -> ID cycleID . COLON TIPO SEMICOLON cycleP_VARS
+    (17) FUNCS -> funcsHeader LEFTBRACE . skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON
+    (4) skipVars -> .
+    (5) skipVars -> . VARS_sect
+    (59) VARS_sect -> . VARS p_VARS
 
-    COLON           shift and go to state 28
+    LEFTBRACE       reduce using rule 4 (skipVars -> .)
+    VARS            shift and go to state 8
 
+    skipVars                       shift and go to state 28
+    VARS_sect                      shift and go to state 7
 
 state 23
 
-    (55) cycleID -> COMMA . ID cycleID
+    (16) funcsHeader -> typeNull ID . LEFTPAREN p_Follow RIGHTPAREN
 
-    ID              shift and go to state 29
+    LEFTPAREN       shift and go to state 29
 
 
 state 24
 
-    (1) programa -> PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO . FIN
+    (60) p_VARS -> ID cycleID . COLON TIPO SEMICOLON cycleP_VARS
 
-    FIN             shift and go to state 30
+    COLON           shift and go to state 30
 
 
 state 25
 
-    (6) CUERPO -> LEFTBRACE . cycleEst RIGHTBRACE
-    (7) cycleEst -> .
-    (8) cycleEst -> . ESTATUTO cycleEst
-    (22) ESTATUTO -> . ASIGNA
-    (23) ESTATUTO -> . CONDICION
-    (24) ESTATUTO -> . CICLO
-    (25) ESTATUTO -> . LLAMADA SEMICOLON
-    (26) ESTATUTO -> . IMPRIME
-    (27) ESTATUTO -> . LEFTBRACKET ESTATUTO RIGHTBRACKET
-    (9) ASIGNA -> . ID ASSIGN EXPRESION SEMICOLON
-    (67) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
-    (68) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
-    (63) CICLO -> . MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (58) IMPRIME -> . ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
+    (62) cycleID -> COMMA . ID cycleID
 
-    RIGHTBRACE      reduce using rule 7 (cycleEst -> .)
-    LEFTBRACKET     shift and go to state 38
-    ID              shift and go to state 39
-    SI              shift and go to state 40
-    MIENTRAS        shift and go to state 41
-    ESCRIBE         shift and go to state 42
+    ID              shift and go to state 31
 
-    cycleEst                       shift and go to state 31
-    ESTATUTO                       shift and go to state 32
-    ASIGNA                         shift and go to state 33
-    CONDICION                      shift and go to state 34
-    CICLO                          shift and go to state 35
-    LLAMADA                        shift and go to state 36
-    IMPRIME                        shift and go to state 37
 
 state 26
 
-    (15) FUNCS -> funcsHeader LEFTBRACE skipVars . CUERPO RIGHTBRACE SEMICOLON
-    (6) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
+    (3) programa -> program_start ID SEMICOLON skipVars cycleFuncs main_start CUERPO . END
 
-    LEFTBRACE       shift and go to state 25
+    END             shift and go to state 32
 
-    CUERPO                         shift and go to state 43
 
 state 27
 
-    (14) funcsHeader -> typeNull ID LEFTPAREN . p_Follow RIGHTPAREN
-    (18) p_Follow -> .
-    (19) p_Follow -> . ID COLON TIPO commaCycleFuncs
+    (8) CUERPO -> LEFTBRACE . cycleEst RIGHTBRACE
+    (9) cycleEst -> .
+    (10) cycleEst -> . ESTATUTO cycleEst
+    (26) ESTATUTO -> . ASIGNA
+    (27) ESTATUTO -> . CONDICION
+    (28) ESTATUTO -> . CICLO
+    (29) ESTATUTO -> . LLAMADA SEMICOLON
+    (30) ESTATUTO -> . IMPRIME
+    (31) ESTATUTO -> . LEFTBRACKET ESTATUTO RIGHTBRACKET
+    (32) ESTATUTO -> . RETURN EXPRESION SEMICOLON
+    (11) ASIGNA -> . ID ASSIGN EXPRESION SEMICOLON
+    (74) CONDICION -> . IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (75) CONDICION -> . IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON
+    (70) CICLO -> . WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (65) IMPRIME -> . PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
 
-    RIGHTPAREN      reduce using rule 18 (p_Follow -> .)
-    ID              shift and go to state 44
+    RIGHTBRACE      reduce using rule 9 (cycleEst -> .)
+    LEFTBRACKET     shift and go to state 40
+    RETURN          shift and go to state 41
+    ID              shift and go to state 42
+    IF              shift and go to state 43
+    WHILE           shift and go to state 44
+    PRINT           shift and go to state 45
 
-    p_Follow                       shift and go to state 45
+    cycleEst                       shift and go to state 33
+    ESTATUTO                       shift and go to state 34
+    ASIGNA                         shift and go to state 35
+    CONDICION                      shift and go to state 36
+    CICLO                          shift and go to state 37
+    LLAMADA                        shift and go to state 38
+    IMPRIME                        shift and go to state 39
 
 state 28
 
-    (53) p_VARS -> ID cycleID COLON . TIPO SEMICOLON cycleP_VARS
-    (12) TIPO -> . ENTERO
-    (13) TIPO -> . FLOTANTE
+    (17) FUNCS -> funcsHeader LEFTBRACE skipVars . func_start CUERPO func_end RIGHTBRACE SEMICOLON
+    (18) func_start -> .
 
-    ENTERO          shift and go to state 14
-    FLOTANTE        shift and go to state 15
+    LEFTBRACE       reduce using rule 18 (func_start -> .)
 
-    TIPO                           shift and go to state 46
+    func_start                     shift and go to state 46
 
 state 29
 
-    (55) cycleID -> COMMA ID . cycleID
-    (54) cycleID -> .
-    (55) cycleID -> . COMMA ID cycleID
+    (16) funcsHeader -> typeNull ID LEFTPAREN . p_Follow RIGHTPAREN
+    (22) p_Follow -> .
+    (23) p_Follow -> . ID COLON TIPO commaCycleFuncs
 
-    COLON           reduce using rule 54 (cycleID -> .)
-    COMMA           shift and go to state 23
+    RIGHTPAREN      reduce using rule 22 (p_Follow -> .)
+    ID              shift and go to state 47
 
-    cycleID                        shift and go to state 47
+    p_Follow                       shift and go to state 48
 
 state 30
 
-    (1) programa -> PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN .
+    (60) p_VARS -> ID cycleID COLON . TIPO SEMICOLON cycleP_VARS
+    (14) TIPO -> . INT
+    (15) TIPO -> . FLOAT
 
-    $end            reduce using rule 1 (programa -> PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN .)
+    INT             shift and go to state 15
+    FLOAT           shift and go to state 16
 
+    TIPO                           shift and go to state 49
 
 state 31
 
-    (6) CUERPO -> LEFTBRACE cycleEst . RIGHTBRACE
+    (62) cycleID -> COMMA ID . cycleID
+    (61) cycleID -> .
+    (62) cycleID -> . COMMA ID cycleID
 
-    RIGHTBRACE      shift and go to state 48
+    COLON           reduce using rule 61 (cycleID -> .)
+    COMMA           shift and go to state 25
 
+    cycleID                        shift and go to state 50
 
 state 32
 
-    (8) cycleEst -> ESTATUTO . cycleEst
-    (7) cycleEst -> .
-    (8) cycleEst -> . ESTATUTO cycleEst
-    (22) ESTATUTO -> . ASIGNA
-    (23) ESTATUTO -> . CONDICION
-    (24) ESTATUTO -> . CICLO
-    (25) ESTATUTO -> . LLAMADA SEMICOLON
-    (26) ESTATUTO -> . IMPRIME
-    (27) ESTATUTO -> . LEFTBRACKET ESTATUTO RIGHTBRACKET
-    (9) ASIGNA -> . ID ASSIGN EXPRESION SEMICOLON
-    (67) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
-    (68) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
-    (63) CICLO -> . MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (58) IMPRIME -> . ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
+    (3) programa -> program_start ID SEMICOLON skipVars cycleFuncs main_start CUERPO END .
 
-    RIGHTBRACE      reduce using rule 7 (cycleEst -> .)
-    LEFTBRACKET     shift and go to state 38
-    ID              shift and go to state 39
-    SI              shift and go to state 40
-    MIENTRAS        shift and go to state 41
-    ESCRIBE         shift and go to state 42
+    $end            reduce using rule 3 (programa -> program_start ID SEMICOLON skipVars cycleFuncs main_start CUERPO END .)
 
-    ESTATUTO                       shift and go to state 32
-    cycleEst                       shift and go to state 49
-    ASIGNA                         shift and go to state 33
-    CONDICION                      shift and go to state 34
-    CICLO                          shift and go to state 35
-    LLAMADA                        shift and go to state 36
-    IMPRIME                        shift and go to state 37
 
 state 33
 
-    (22) ESTATUTO -> ASIGNA .
+    (8) CUERPO -> LEFTBRACE cycleEst . RIGHTBRACE
 
-    LEFTBRACKET     reduce using rule 22 (ESTATUTO -> ASIGNA .)
-    ID              reduce using rule 22 (ESTATUTO -> ASIGNA .)
-    SI              reduce using rule 22 (ESTATUTO -> ASIGNA .)
-    MIENTRAS        reduce using rule 22 (ESTATUTO -> ASIGNA .)
-    ESCRIBE         reduce using rule 22 (ESTATUTO -> ASIGNA .)
-    RIGHTBRACE      reduce using rule 22 (ESTATUTO -> ASIGNA .)
-    RIGHTBRACKET    reduce using rule 22 (ESTATUTO -> ASIGNA .)
+    RIGHTBRACE      shift and go to state 51
 
 
 state 34
 
-    (23) ESTATUTO -> CONDICION .
+    (10) cycleEst -> ESTATUTO . cycleEst
+    (9) cycleEst -> .
+    (10) cycleEst -> . ESTATUTO cycleEst
+    (26) ESTATUTO -> . ASIGNA
+    (27) ESTATUTO -> . CONDICION
+    (28) ESTATUTO -> . CICLO
+    (29) ESTATUTO -> . LLAMADA SEMICOLON
+    (30) ESTATUTO -> . IMPRIME
+    (31) ESTATUTO -> . LEFTBRACKET ESTATUTO RIGHTBRACKET
+    (32) ESTATUTO -> . RETURN EXPRESION SEMICOLON
+    (11) ASIGNA -> . ID ASSIGN EXPRESION SEMICOLON
+    (74) CONDICION -> . IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (75) CONDICION -> . IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON
+    (70) CICLO -> . WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (65) IMPRIME -> . PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
 
-    LEFTBRACKET     reduce using rule 23 (ESTATUTO -> CONDICION .)
-    ID              reduce using rule 23 (ESTATUTO -> CONDICION .)
-    SI              reduce using rule 23 (ESTATUTO -> CONDICION .)
-    MIENTRAS        reduce using rule 23 (ESTATUTO -> CONDICION .)
-    ESCRIBE         reduce using rule 23 (ESTATUTO -> CONDICION .)
-    RIGHTBRACE      reduce using rule 23 (ESTATUTO -> CONDICION .)
-    RIGHTBRACKET    reduce using rule 23 (ESTATUTO -> CONDICION .)
+    RIGHTBRACE      reduce using rule 9 (cycleEst -> .)
+    LEFTBRACKET     shift and go to state 40
+    RETURN          shift and go to state 41
+    ID              shift and go to state 42
+    IF              shift and go to state 43
+    WHILE           shift and go to state 44
+    PRINT           shift and go to state 45
 
+    ESTATUTO                       shift and go to state 34
+    cycleEst                       shift and go to state 52
+    ASIGNA                         shift and go to state 35
+    CONDICION                      shift and go to state 36
+    CICLO                          shift and go to state 37
+    LLAMADA                        shift and go to state 38
+    IMPRIME                        shift and go to state 39
 
 state 35
 
-    (24) ESTATUTO -> CICLO .
+    (26) ESTATUTO -> ASIGNA .
 
-    LEFTBRACKET     reduce using rule 24 (ESTATUTO -> CICLO .)
-    ID              reduce using rule 24 (ESTATUTO -> CICLO .)
-    SI              reduce using rule 24 (ESTATUTO -> CICLO .)
-    MIENTRAS        reduce using rule 24 (ESTATUTO -> CICLO .)
-    ESCRIBE         reduce using rule 24 (ESTATUTO -> CICLO .)
-    RIGHTBRACE      reduce using rule 24 (ESTATUTO -> CICLO .)
-    RIGHTBRACKET    reduce using rule 24 (ESTATUTO -> CICLO .)
+    LEFTBRACKET     reduce using rule 26 (ESTATUTO -> ASIGNA .)
+    RETURN          reduce using rule 26 (ESTATUTO -> ASIGNA .)
+    ID              reduce using rule 26 (ESTATUTO -> ASIGNA .)
+    IF              reduce using rule 26 (ESTATUTO -> ASIGNA .)
+    WHILE           reduce using rule 26 (ESTATUTO -> ASIGNA .)
+    PRINT           reduce using rule 26 (ESTATUTO -> ASIGNA .)
+    RIGHTBRACE      reduce using rule 26 (ESTATUTO -> ASIGNA .)
+    RIGHTBRACKET    reduce using rule 26 (ESTATUTO -> ASIGNA .)
 
 
 state 36
 
-    (25) ESTATUTO -> LLAMADA . SEMICOLON
+    (27) ESTATUTO -> CONDICION .
 
-    SEMICOLON       shift and go to state 50
+    LEFTBRACKET     reduce using rule 27 (ESTATUTO -> CONDICION .)
+    RETURN          reduce using rule 27 (ESTATUTO -> CONDICION .)
+    ID              reduce using rule 27 (ESTATUTO -> CONDICION .)
+    IF              reduce using rule 27 (ESTATUTO -> CONDICION .)
+    WHILE           reduce using rule 27 (ESTATUTO -> CONDICION .)
+    PRINT           reduce using rule 27 (ESTATUTO -> CONDICION .)
+    RIGHTBRACE      reduce using rule 27 (ESTATUTO -> CONDICION .)
+    RIGHTBRACKET    reduce using rule 27 (ESTATUTO -> CONDICION .)
 
 
 state 37
 
-    (26) ESTATUTO -> IMPRIME .
+    (28) ESTATUTO -> CICLO .
 
-    LEFTBRACKET     reduce using rule 26 (ESTATUTO -> IMPRIME .)
-    ID              reduce using rule 26 (ESTATUTO -> IMPRIME .)
-    SI              reduce using rule 26 (ESTATUTO -> IMPRIME .)
-    MIENTRAS        reduce using rule 26 (ESTATUTO -> IMPRIME .)
-    ESCRIBE         reduce using rule 26 (ESTATUTO -> IMPRIME .)
-    RIGHTBRACE      reduce using rule 26 (ESTATUTO -> IMPRIME .)
-    RIGHTBRACKET    reduce using rule 26 (ESTATUTO -> IMPRIME .)
+    LEFTBRACKET     reduce using rule 28 (ESTATUTO -> CICLO .)
+    RETURN          reduce using rule 28 (ESTATUTO -> CICLO .)
+    ID              reduce using rule 28 (ESTATUTO -> CICLO .)
+    IF              reduce using rule 28 (ESTATUTO -> CICLO .)
+    WHILE           reduce using rule 28 (ESTATUTO -> CICLO .)
+    PRINT           reduce using rule 28 (ESTATUTO -> CICLO .)
+    RIGHTBRACE      reduce using rule 28 (ESTATUTO -> CICLO .)
+    RIGHTBRACKET    reduce using rule 28 (ESTATUTO -> CICLO .)
 
 
 state 38
 
-    (27) ESTATUTO -> LEFTBRACKET . ESTATUTO RIGHTBRACKET
-    (22) ESTATUTO -> . ASIGNA
-    (23) ESTATUTO -> . CONDICION
-    (24) ESTATUTO -> . CICLO
-    (25) ESTATUTO -> . LLAMADA SEMICOLON
-    (26) ESTATUTO -> . IMPRIME
-    (27) ESTATUTO -> . LEFTBRACKET ESTATUTO RIGHTBRACKET
-    (9) ASIGNA -> . ID ASSIGN EXPRESION SEMICOLON
-    (67) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
-    (68) CONDICION -> . SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
-    (63) CICLO -> . MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (58) IMPRIME -> . ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
+    (29) ESTATUTO -> LLAMADA . SEMICOLON
 
-    LEFTBRACKET     shift and go to state 38
-    ID              shift and go to state 39
-    SI              shift and go to state 40
-    MIENTRAS        shift and go to state 41
-    ESCRIBE         shift and go to state 42
+    SEMICOLON       shift and go to state 53
 
-    ESTATUTO                       shift and go to state 51
-    ASIGNA                         shift and go to state 33
-    CONDICION                      shift and go to state 34
-    CICLO                          shift and go to state 35
-    LLAMADA                        shift and go to state 36
-    IMPRIME                        shift and go to state 37
 
 state 39
 
-    (9) ASIGNA -> ID . ASSIGN EXPRESION SEMICOLON
-    (47) LLAMADA -> ID . LEFTPAREN args RIGHTPAREN
+    (30) ESTATUTO -> IMPRIME .
 
-    ASSIGN          shift and go to state 52
-    LEFTPAREN       shift and go to state 53
+    LEFTBRACKET     reduce using rule 30 (ESTATUTO -> IMPRIME .)
+    RETURN          reduce using rule 30 (ESTATUTO -> IMPRIME .)
+    ID              reduce using rule 30 (ESTATUTO -> IMPRIME .)
+    IF              reduce using rule 30 (ESTATUTO -> IMPRIME .)
+    WHILE           reduce using rule 30 (ESTATUTO -> IMPRIME .)
+    PRINT           reduce using rule 30 (ESTATUTO -> IMPRIME .)
+    RIGHTBRACE      reduce using rule 30 (ESTATUTO -> IMPRIME .)
+    RIGHTBRACKET    reduce using rule 30 (ESTATUTO -> IMPRIME .)
 
 
 state 40
 
-    (67) CONDICION -> SI . LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
-    (68) CONDICION -> SI . LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
+    (31) ESTATUTO -> LEFTBRACKET . ESTATUTO RIGHTBRACKET
+    (26) ESTATUTO -> . ASIGNA
+    (27) ESTATUTO -> . CONDICION
+    (28) ESTATUTO -> . CICLO
+    (29) ESTATUTO -> . LLAMADA SEMICOLON
+    (30) ESTATUTO -> . IMPRIME
+    (31) ESTATUTO -> . LEFTBRACKET ESTATUTO RIGHTBRACKET
+    (32) ESTATUTO -> . RETURN EXPRESION SEMICOLON
+    (11) ASIGNA -> . ID ASSIGN EXPRESION SEMICOLON
+    (74) CONDICION -> . IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (75) CONDICION -> . IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON
+    (70) CICLO -> . WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (65) IMPRIME -> . PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
 
-    LEFTPAREN       shift and go to state 54
+    LEFTBRACKET     shift and go to state 40
+    RETURN          shift and go to state 41
+    ID              shift and go to state 42
+    IF              shift and go to state 43
+    WHILE           shift and go to state 44
+    PRINT           shift and go to state 45
 
+    ESTATUTO                       shift and go to state 54
+    ASIGNA                         shift and go to state 35
+    CONDICION                      shift and go to state 36
+    CICLO                          shift and go to state 37
+    LLAMADA                        shift and go to state 38
+    IMPRIME                        shift and go to state 39
 
 state 41
 
-    (63) CICLO -> MIENTRAS . ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
-    (64) ciclo_start -> .
+    (32) ESTATUTO -> RETURN . EXPRESION SEMICOLON
+    (33) EXPRESION -> . EXP signsExp
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    LEFTPAREN       reduce using rule 64 (ciclo_start -> .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
-    ciclo_start                    shift and go to state 55
+    EXPRESION                      shift and go to state 55
+    EXP                            shift and go to state 56
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 42
 
-    (58) IMPRIME -> ESCRIBE . LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
+    (11) ASIGNA -> ID . ASSIGN EXPRESION SEMICOLON
+    (52) LLAMADA -> ID . ERA LEFTPAREN args RIGHTPAREN
+    (53) ERA -> .
 
-    LEFTPAREN       shift and go to state 56
+    ASSIGN          shift and go to state 68
+    LEFTPAREN       reduce using rule 53 (ERA -> .)
 
+    ERA                            shift and go to state 69
 
 state 43
 
-    (15) FUNCS -> funcsHeader LEFTBRACE skipVars CUERPO . RIGHTBRACE SEMICOLON
+    (74) CONDICION -> IF . LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (75) CONDICION -> IF . LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON
 
-    RIGHTBRACE      shift and go to state 57
+    LEFTPAREN       shift and go to state 70
 
 
 state 44
 
-    (19) p_Follow -> ID . COLON TIPO commaCycleFuncs
+    (70) CICLO -> WHILE . ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON
+    (71) ciclo_start -> .
 
-    COLON           shift and go to state 58
+    LEFTPAREN       reduce using rule 71 (ciclo_start -> .)
 
+    ciclo_start                    shift and go to state 71
 
 state 45
 
-    (14) funcsHeader -> typeNull ID LEFTPAREN p_Follow . RIGHTPAREN
+    (65) IMPRIME -> PRINT . LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON
 
-    RIGHTPAREN      shift and go to state 59
+    LEFTPAREN       shift and go to state 72
 
 
 state 46
 
-    (53) p_VARS -> ID cycleID COLON TIPO . SEMICOLON cycleP_VARS
+    (17) FUNCS -> funcsHeader LEFTBRACE skipVars func_start . CUERPO func_end RIGHTBRACE SEMICOLON
+    (8) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
 
-    SEMICOLON       shift and go to state 60
+    LEFTBRACE       shift and go to state 27
 
+    CUERPO                         shift and go to state 73
 
 state 47
 
-    (55) cycleID -> COMMA ID cycleID .
+    (23) p_Follow -> ID . COLON TIPO commaCycleFuncs
 
-    COLON           reduce using rule 55 (cycleID -> COMMA ID cycleID .)
+    COLON           shift and go to state 74
 
 
 state 48
 
-    (6) CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .
+    (16) funcsHeader -> typeNull ID LEFTPAREN p_Follow . RIGHTPAREN
 
-    FIN             reduce using rule 6 (CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .)
-    RIGHTBRACE      reduce using rule 6 (CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .)
-    SINO            reduce using rule 6 (CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .)
-    SEMICOLON       reduce using rule 6 (CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .)
+    RIGHTPAREN      shift and go to state 75
 
 
 state 49
 
-    (8) cycleEst -> ESTATUTO cycleEst .
+    (60) p_VARS -> ID cycleID COLON TIPO . SEMICOLON cycleP_VARS
 
-    RIGHTBRACE      reduce using rule 8 (cycleEst -> ESTATUTO cycleEst .)
+    SEMICOLON       shift and go to state 76
 
 
 state 50
 
-    (25) ESTATUTO -> LLAMADA SEMICOLON .
+    (62) cycleID -> COMMA ID cycleID .
 
-    LEFTBRACKET     reduce using rule 25 (ESTATUTO -> LLAMADA SEMICOLON .)
-    ID              reduce using rule 25 (ESTATUTO -> LLAMADA SEMICOLON .)
-    SI              reduce using rule 25 (ESTATUTO -> LLAMADA SEMICOLON .)
-    MIENTRAS        reduce using rule 25 (ESTATUTO -> LLAMADA SEMICOLON .)
-    ESCRIBE         reduce using rule 25 (ESTATUTO -> LLAMADA SEMICOLON .)
-    RIGHTBRACE      reduce using rule 25 (ESTATUTO -> LLAMADA SEMICOLON .)
-    RIGHTBRACKET    reduce using rule 25 (ESTATUTO -> LLAMADA SEMICOLON .)
+    COLON           reduce using rule 62 (cycleID -> COMMA ID cycleID .)
 
 
 state 51
 
-    (27) ESTATUTO -> LEFTBRACKET ESTATUTO . RIGHTBRACKET
+    (8) CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .
 
-    RIGHTBRACKET    shift and go to state 61
+    END             reduce using rule 8 (CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .)
+    RIGHTBRACE      reduce using rule 8 (CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .)
+    ELSE            reduce using rule 8 (CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .)
+    SEMICOLON       reduce using rule 8 (CUERPO -> LEFTBRACE cycleEst RIGHTBRACE .)
 
 
 state 52
 
-    (9) ASIGNA -> ID ASSIGN . EXPRESION SEMICOLON
-    (28) EXPRESION -> . EXP signsExp
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (10) cycleEst -> ESTATUTO cycleEst .
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    RIGHTBRACE      reduce using rule 10 (cycleEst -> ESTATUTO cycleEst .)
 
-    EXPRESION                      shift and go to state 63
-    EXP                            shift and go to state 64
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 53
 
-    (47) LLAMADA -> ID LEFTPAREN . args RIGHTPAREN
-    (48) args -> .
-    (49) args -> . EXPRESION argsCycle
-    (28) EXPRESION -> . EXP signsExp
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (29) ESTATUTO -> LLAMADA SEMICOLON .
 
-    RIGHTPAREN      reduce using rule 48 (args -> .)
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    LEFTBRACKET     reduce using rule 29 (ESTATUTO -> LLAMADA SEMICOLON .)
+    RETURN          reduce using rule 29 (ESTATUTO -> LLAMADA SEMICOLON .)
+    ID              reduce using rule 29 (ESTATUTO -> LLAMADA SEMICOLON .)
+    IF              reduce using rule 29 (ESTATUTO -> LLAMADA SEMICOLON .)
+    WHILE           reduce using rule 29 (ESTATUTO -> LLAMADA SEMICOLON .)
+    PRINT           reduce using rule 29 (ESTATUTO -> LLAMADA SEMICOLON .)
+    RIGHTBRACE      reduce using rule 29 (ESTATUTO -> LLAMADA SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 29 (ESTATUTO -> LLAMADA SEMICOLON .)
 
-    args                           shift and go to state 75
-    EXPRESION                      shift and go to state 76
-    EXP                            shift and go to state 64
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 54
 
-    (67) CONDICION -> SI LEFTPAREN . EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
-    (68) CONDICION -> SI LEFTPAREN . EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
-    (28) EXPRESION -> . EXP signsExp
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (31) ESTATUTO -> LEFTBRACKET ESTATUTO . RIGHTBRACKET
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    RIGHTBRACKET    shift and go to state 77
 
-    EXPRESION                      shift and go to state 77
-    EXP                            shift and go to state 64
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 55
 
-    (63) CICLO -> MIENTRAS ciclo_start . LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
+    (32) ESTATUTO -> RETURN EXPRESION . SEMICOLON
 
-    LEFTPAREN       shift and go to state 78
+    SEMICOLON       shift and go to state 78
 
 
 state 56
 
-    (58) IMPRIME -> ESCRIBE LEFTPAREN . imp cycleImp RIGHTPAREN SEMICOLON
-    (59) imp -> . LETRERO
-    (60) imp -> . EXPRESION
-    (28) EXPRESION -> . EXP signsExp
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (33) EXPRESION -> EXP . signsExp
+    (39) EXP -> EXP . PLUS TERMINO
+    (40) EXP -> EXP . MINUS TERMINO
+    (34) signsExp -> .
+    (35) signsExp -> . GREATERTHAN EXP
+    (36) signsExp -> . LESSTHAN EXP
+    (37) signsExp -> . EQUAL EXP
+    (38) signsExp -> . NOTEQ EXP
 
-    LETRERO         shift and go to state 80
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    PLUS            shift and go to state 80
+    MINUS           shift and go to state 81
+    SEMICOLON       reduce using rule 34 (signsExp -> .)
+    RIGHTPAREN      reduce using rule 34 (signsExp -> .)
+    COMMA           reduce using rule 34 (signsExp -> .)
+    GREATERTHAN     shift and go to state 82
+    LESSTHAN        shift and go to state 83
+    EQUAL           shift and go to state 84
+    NOTEQ           shift and go to state 85
 
-    imp                            shift and go to state 79
-    EXPRESION                      shift and go to state 81
-    EXP                            shift and go to state 64
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
+    signsExp                       shift and go to state 79
 
 state 57
 
-    (15) FUNCS -> funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE . SEMICOLON
+    (47) FACTOR -> PLUS . skipID
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    SEMICOLON       shift and go to state 82
+    ID              shift and go to state 87
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    skipID                         shift and go to state 86
+    CTE                            shift and go to state 65
 
 state 58
 
-    (19) p_Follow -> ID COLON . TIPO commaCycleFuncs
-    (12) TIPO -> . ENTERO
-    (13) TIPO -> . FLOTANTE
+    (41) EXP -> TERMINO .
+    (42) TERMINO -> TERMINO . MULT FACTOR
+    (43) TERMINO -> TERMINO . DIVIDE FACTOR
 
-    ENTERO          shift and go to state 14
-    FLOTANTE        shift and go to state 15
+    PLUS            reduce using rule 41 (EXP -> TERMINO .)
+    MINUS           reduce using rule 41 (EXP -> TERMINO .)
+    GREATERTHAN     reduce using rule 41 (EXP -> TERMINO .)
+    LESSTHAN        reduce using rule 41 (EXP -> TERMINO .)
+    EQUAL           reduce using rule 41 (EXP -> TERMINO .)
+    NOTEQ           reduce using rule 41 (EXP -> TERMINO .)
+    SEMICOLON       reduce using rule 41 (EXP -> TERMINO .)
+    RIGHTPAREN      reduce using rule 41 (EXP -> TERMINO .)
+    COMMA           reduce using rule 41 (EXP -> TERMINO .)
+    MULT            shift and go to state 88
+    DIVIDE          shift and go to state 89
 
-    TIPO                           shift and go to state 83
 
 state 59
 
-    (14) funcsHeader -> typeNull ID LEFTPAREN p_Follow RIGHTPAREN .
+    (48) FACTOR -> MINUS . skipID
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    LEFTBRACE       reduce using rule 14 (funcsHeader -> typeNull ID LEFTPAREN p_Follow RIGHTPAREN .)
+    ID              shift and go to state 87
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    skipID                         shift and go to state 90
+    CTE                            shift and go to state 65
 
 state 60
 
-    (53) p_VARS -> ID cycleID COLON TIPO SEMICOLON . cycleP_VARS
-    (56) cycleP_VARS -> .
-    (57) cycleP_VARS -> . p_VARS
-    (53) p_VARS -> . ID cycleID COLON TIPO SEMICOLON cycleP_VARS
+    (44) TERMINO -> FACTOR .
 
-    NULA            reduce using rule 56 (cycleP_VARS -> .)
-    ENTERO          reduce using rule 56 (cycleP_VARS -> .)
-    FLOTANTE        reduce using rule 56 (cycleP_VARS -> .)
-    INICIO          reduce using rule 56 (cycleP_VARS -> .)
-    LEFTBRACE       reduce using rule 56 (cycleP_VARS -> .)
-    ID              shift and go to state 17
+    MULT            reduce using rule 44 (TERMINO -> FACTOR .)
+    DIVIDE          reduce using rule 44 (TERMINO -> FACTOR .)
+    PLUS            reduce using rule 44 (TERMINO -> FACTOR .)
+    MINUS           reduce using rule 44 (TERMINO -> FACTOR .)
+    GREATERTHAN     reduce using rule 44 (TERMINO -> FACTOR .)
+    LESSTHAN        reduce using rule 44 (TERMINO -> FACTOR .)
+    EQUAL           reduce using rule 44 (TERMINO -> FACTOR .)
+    NOTEQ           reduce using rule 44 (TERMINO -> FACTOR .)
+    SEMICOLON       reduce using rule 44 (TERMINO -> FACTOR .)
+    RIGHTPAREN      reduce using rule 44 (TERMINO -> FACTOR .)
+    COMMA           reduce using rule 44 (TERMINO -> FACTOR .)
 
-    cycleP_VARS                    shift and go to state 84
-    p_VARS                         shift and go to state 85
 
 state 61
 
-    (27) ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .
+    (45) FACTOR -> LEFTPAREN . EXPRESION RIGHTPAREN
+    (33) EXPRESION -> . EXP signsExp
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    LEFTBRACKET     reduce using rule 27 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
-    ID              reduce using rule 27 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
-    SI              reduce using rule 27 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
-    MIENTRAS        reduce using rule 27 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
-    ESCRIBE         reduce using rule 27 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
-    RIGHTBRACE      reduce using rule 27 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
-    RIGHTBRACKET    reduce using rule 27 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    EXPRESION                      shift and go to state 91
+    EXP                            shift and go to state 56
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 62
 
-    (47) LLAMADA -> ID . LEFTPAREN args RIGHTPAREN
-    (45) skipID -> ID .
+    (46) FACTOR -> LLAMADA .
 
-    LEFTPAREN       shift and go to state 53
-    MULT            reduce using rule 45 (skipID -> ID .)
-    DIVIDE          reduce using rule 45 (skipID -> ID .)
-    PLUS            reduce using rule 45 (skipID -> ID .)
-    MINUS           reduce using rule 45 (skipID -> ID .)
-    GREATERTHAN     reduce using rule 45 (skipID -> ID .)
-    LESSTHAN        reduce using rule 45 (skipID -> ID .)
-    EQUAL           reduce using rule 45 (skipID -> ID .)
-    NOTEQ           reduce using rule 45 (skipID -> ID .)
-    SEMICOLON       reduce using rule 45 (skipID -> ID .)
-    COMMA           reduce using rule 45 (skipID -> ID .)
-    RIGHTPAREN      reduce using rule 45 (skipID -> ID .)
+    MULT            reduce using rule 46 (FACTOR -> LLAMADA .)
+    DIVIDE          reduce using rule 46 (FACTOR -> LLAMADA .)
+    PLUS            reduce using rule 46 (FACTOR -> LLAMADA .)
+    MINUS           reduce using rule 46 (FACTOR -> LLAMADA .)
+    GREATERTHAN     reduce using rule 46 (FACTOR -> LLAMADA .)
+    LESSTHAN        reduce using rule 46 (FACTOR -> LLAMADA .)
+    EQUAL           reduce using rule 46 (FACTOR -> LLAMADA .)
+    NOTEQ           reduce using rule 46 (FACTOR -> LLAMADA .)
+    SEMICOLON       reduce using rule 46 (FACTOR -> LLAMADA .)
+    RIGHTPAREN      reduce using rule 46 (FACTOR -> LLAMADA .)
+    COMMA           reduce using rule 46 (FACTOR -> LLAMADA .)
 
 
 state 63
 
-    (9) ASIGNA -> ID ASSIGN EXPRESION . SEMICOLON
+    (49) FACTOR -> skipID .
 
-    SEMICOLON       shift and go to state 86
+    MULT            reduce using rule 49 (FACTOR -> skipID .)
+    DIVIDE          reduce using rule 49 (FACTOR -> skipID .)
+    PLUS            reduce using rule 49 (FACTOR -> skipID .)
+    MINUS           reduce using rule 49 (FACTOR -> skipID .)
+    GREATERTHAN     reduce using rule 49 (FACTOR -> skipID .)
+    LESSTHAN        reduce using rule 49 (FACTOR -> skipID .)
+    EQUAL           reduce using rule 49 (FACTOR -> skipID .)
+    NOTEQ           reduce using rule 49 (FACTOR -> skipID .)
+    SEMICOLON       reduce using rule 49 (FACTOR -> skipID .)
+    RIGHTPAREN      reduce using rule 49 (FACTOR -> skipID .)
+    COMMA           reduce using rule 49 (FACTOR -> skipID .)
 
 
 state 64
 
-    (28) EXPRESION -> EXP . signsExp
-    (34) EXP -> EXP . PLUS TERMINO
-    (35) EXP -> EXP . MINUS TERMINO
-    (29) signsExp -> .
-    (30) signsExp -> . GREATERTHAN EXP
-    (31) signsExp -> . LESSTHAN EXP
-    (32) signsExp -> . EQUAL EXP
-    (33) signsExp -> . NOTEQ EXP
+    (52) LLAMADA -> ID . ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> ID .
+    (53) ERA -> .
 
-    PLUS            shift and go to state 88
-    MINUS           shift and go to state 89
-    SEMICOLON       reduce using rule 29 (signsExp -> .)
-    COMMA           reduce using rule 29 (signsExp -> .)
-    RIGHTPAREN      reduce using rule 29 (signsExp -> .)
-    GREATERTHAN     shift and go to state 90
-    LESSTHAN        shift and go to state 91
-    EQUAL           shift and go to state 92
-    NOTEQ           shift and go to state 93
+    MULT            reduce using rule 50 (skipID -> ID .)
+    DIVIDE          reduce using rule 50 (skipID -> ID .)
+    PLUS            reduce using rule 50 (skipID -> ID .)
+    MINUS           reduce using rule 50 (skipID -> ID .)
+    GREATERTHAN     reduce using rule 50 (skipID -> ID .)
+    LESSTHAN        reduce using rule 50 (skipID -> ID .)
+    EQUAL           reduce using rule 50 (skipID -> ID .)
+    NOTEQ           reduce using rule 50 (skipID -> ID .)
+    SEMICOLON       reduce using rule 50 (skipID -> ID .)
+    RIGHTPAREN      reduce using rule 50 (skipID -> ID .)
+    COMMA           reduce using rule 50 (skipID -> ID .)
+    LEFTPAREN       reduce using rule 53 (ERA -> .)
 
-    signsExp                       shift and go to state 87
+    ERA                            shift and go to state 69
 
 state 65
 
-    (42) FACTOR -> PLUS . skipID
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (51) skipID -> CTE .
 
-    ID              shift and go to state 95
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    MULT            reduce using rule 51 (skipID -> CTE .)
+    DIVIDE          reduce using rule 51 (skipID -> CTE .)
+    PLUS            reduce using rule 51 (skipID -> CTE .)
+    MINUS           reduce using rule 51 (skipID -> CTE .)
+    GREATERTHAN     reduce using rule 51 (skipID -> CTE .)
+    LESSTHAN        reduce using rule 51 (skipID -> CTE .)
+    EQUAL           reduce using rule 51 (skipID -> CTE .)
+    NOTEQ           reduce using rule 51 (skipID -> CTE .)
+    SEMICOLON       reduce using rule 51 (skipID -> CTE .)
+    RIGHTPAREN      reduce using rule 51 (skipID -> CTE .)
+    COMMA           reduce using rule 51 (skipID -> CTE .)
 
-    skipID                         shift and go to state 94
-    CTE                            shift and go to state 72
 
 state 66
 
-    (36) EXP -> TERMINO .
-    (37) TERMINO -> TERMINO . MULT FACTOR
-    (38) TERMINO -> TERMINO . DIVIDE FACTOR
+    (12) CTE -> CTE_INT .
 
-    PLUS            reduce using rule 36 (EXP -> TERMINO .)
-    MINUS           reduce using rule 36 (EXP -> TERMINO .)
-    GREATERTHAN     reduce using rule 36 (EXP -> TERMINO .)
-    LESSTHAN        reduce using rule 36 (EXP -> TERMINO .)
-    EQUAL           reduce using rule 36 (EXP -> TERMINO .)
-    NOTEQ           reduce using rule 36 (EXP -> TERMINO .)
-    SEMICOLON       reduce using rule 36 (EXP -> TERMINO .)
-    COMMA           reduce using rule 36 (EXP -> TERMINO .)
-    RIGHTPAREN      reduce using rule 36 (EXP -> TERMINO .)
-    MULT            shift and go to state 96
-    DIVIDE          shift and go to state 97
+    MULT            reduce using rule 12 (CTE -> CTE_INT .)
+    DIVIDE          reduce using rule 12 (CTE -> CTE_INT .)
+    PLUS            reduce using rule 12 (CTE -> CTE_INT .)
+    MINUS           reduce using rule 12 (CTE -> CTE_INT .)
+    GREATERTHAN     reduce using rule 12 (CTE -> CTE_INT .)
+    LESSTHAN        reduce using rule 12 (CTE -> CTE_INT .)
+    EQUAL           reduce using rule 12 (CTE -> CTE_INT .)
+    NOTEQ           reduce using rule 12 (CTE -> CTE_INT .)
+    SEMICOLON       reduce using rule 12 (CTE -> CTE_INT .)
+    RIGHTPAREN      reduce using rule 12 (CTE -> CTE_INT .)
+    COMMA           reduce using rule 12 (CTE -> CTE_INT .)
 
 
 state 67
 
-    (43) FACTOR -> MINUS . skipID
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (13) CTE -> CTE_FLOAT .
 
-    ID              shift and go to state 95
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    MULT            reduce using rule 13 (CTE -> CTE_FLOAT .)
+    DIVIDE          reduce using rule 13 (CTE -> CTE_FLOAT .)
+    PLUS            reduce using rule 13 (CTE -> CTE_FLOAT .)
+    MINUS           reduce using rule 13 (CTE -> CTE_FLOAT .)
+    GREATERTHAN     reduce using rule 13 (CTE -> CTE_FLOAT .)
+    LESSTHAN        reduce using rule 13 (CTE -> CTE_FLOAT .)
+    EQUAL           reduce using rule 13 (CTE -> CTE_FLOAT .)
+    NOTEQ           reduce using rule 13 (CTE -> CTE_FLOAT .)
+    SEMICOLON       reduce using rule 13 (CTE -> CTE_FLOAT .)
+    RIGHTPAREN      reduce using rule 13 (CTE -> CTE_FLOAT .)
+    COMMA           reduce using rule 13 (CTE -> CTE_FLOAT .)
 
-    skipID                         shift and go to state 98
-    CTE                            shift and go to state 72
 
 state 68
 
-    (39) TERMINO -> FACTOR .
+    (11) ASIGNA -> ID ASSIGN . EXPRESION SEMICOLON
+    (33) EXPRESION -> . EXP signsExp
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    MULT            reduce using rule 39 (TERMINO -> FACTOR .)
-    DIVIDE          reduce using rule 39 (TERMINO -> FACTOR .)
-    PLUS            reduce using rule 39 (TERMINO -> FACTOR .)
-    MINUS           reduce using rule 39 (TERMINO -> FACTOR .)
-    GREATERTHAN     reduce using rule 39 (TERMINO -> FACTOR .)
-    LESSTHAN        reduce using rule 39 (TERMINO -> FACTOR .)
-    EQUAL           reduce using rule 39 (TERMINO -> FACTOR .)
-    NOTEQ           reduce using rule 39 (TERMINO -> FACTOR .)
-    SEMICOLON       reduce using rule 39 (TERMINO -> FACTOR .)
-    COMMA           reduce using rule 39 (TERMINO -> FACTOR .)
-    RIGHTPAREN      reduce using rule 39 (TERMINO -> FACTOR .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    EXPRESION                      shift and go to state 92
+    EXP                            shift and go to state 56
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 69
 
-    (40) FACTOR -> LEFTPAREN . EXPRESION RIGHTPAREN
-    (28) EXPRESION -> . EXP signsExp
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (52) LLAMADA -> ID ERA . LEFTPAREN args RIGHTPAREN
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    LEFTPAREN       shift and go to state 93
 
-    EXPRESION                      shift and go to state 99
-    EXP                            shift and go to state 64
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 70
 
-    (41) FACTOR -> LLAMADA .
+    (74) CONDICION -> IF LEFTPAREN . EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (75) CONDICION -> IF LEFTPAREN . EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON
+    (33) EXPRESION -> . EXP signsExp
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    MULT            reduce using rule 41 (FACTOR -> LLAMADA .)
-    DIVIDE          reduce using rule 41 (FACTOR -> LLAMADA .)
-    PLUS            reduce using rule 41 (FACTOR -> LLAMADA .)
-    MINUS           reduce using rule 41 (FACTOR -> LLAMADA .)
-    GREATERTHAN     reduce using rule 41 (FACTOR -> LLAMADA .)
-    LESSTHAN        reduce using rule 41 (FACTOR -> LLAMADA .)
-    EQUAL           reduce using rule 41 (FACTOR -> LLAMADA .)
-    NOTEQ           reduce using rule 41 (FACTOR -> LLAMADA .)
-    SEMICOLON       reduce using rule 41 (FACTOR -> LLAMADA .)
-    COMMA           reduce using rule 41 (FACTOR -> LLAMADA .)
-    RIGHTPAREN      reduce using rule 41 (FACTOR -> LLAMADA .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    EXPRESION                      shift and go to state 94
+    EXP                            shift and go to state 56
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 71
 
-    (44) FACTOR -> skipID .
+    (70) CICLO -> WHILE ciclo_start . LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON
 
-    MULT            reduce using rule 44 (FACTOR -> skipID .)
-    DIVIDE          reduce using rule 44 (FACTOR -> skipID .)
-    PLUS            reduce using rule 44 (FACTOR -> skipID .)
-    MINUS           reduce using rule 44 (FACTOR -> skipID .)
-    GREATERTHAN     reduce using rule 44 (FACTOR -> skipID .)
-    LESSTHAN        reduce using rule 44 (FACTOR -> skipID .)
-    EQUAL           reduce using rule 44 (FACTOR -> skipID .)
-    NOTEQ           reduce using rule 44 (FACTOR -> skipID .)
-    SEMICOLON       reduce using rule 44 (FACTOR -> skipID .)
-    COMMA           reduce using rule 44 (FACTOR -> skipID .)
-    RIGHTPAREN      reduce using rule 44 (FACTOR -> skipID .)
+    LEFTPAREN       shift and go to state 95
 
 
 state 72
 
-    (46) skipID -> CTE .
+    (65) IMPRIME -> PRINT LEFTPAREN . imp cycleImp RIGHTPAREN SEMICOLON
+    (66) imp -> . LETRERO
+    (67) imp -> . EXPRESION
+    (33) EXPRESION -> . EXP signsExp
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    MULT            reduce using rule 46 (skipID -> CTE .)
-    DIVIDE          reduce using rule 46 (skipID -> CTE .)
-    PLUS            reduce using rule 46 (skipID -> CTE .)
-    MINUS           reduce using rule 46 (skipID -> CTE .)
-    GREATERTHAN     reduce using rule 46 (skipID -> CTE .)
-    LESSTHAN        reduce using rule 46 (skipID -> CTE .)
-    EQUAL           reduce using rule 46 (skipID -> CTE .)
-    NOTEQ           reduce using rule 46 (skipID -> CTE .)
-    SEMICOLON       reduce using rule 46 (skipID -> CTE .)
-    COMMA           reduce using rule 46 (skipID -> CTE .)
-    RIGHTPAREN      reduce using rule 46 (skipID -> CTE .)
+    LETRERO         shift and go to state 97
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    imp                            shift and go to state 96
+    EXPRESION                      shift and go to state 98
+    EXP                            shift and go to state 56
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 73
 
-    (10) CTE -> CTE_ENT .
+    (17) FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO . func_end RIGHTBRACE SEMICOLON
+    (19) func_end -> .
 
-    MULT            reduce using rule 10 (CTE -> CTE_ENT .)
-    DIVIDE          reduce using rule 10 (CTE -> CTE_ENT .)
-    PLUS            reduce using rule 10 (CTE -> CTE_ENT .)
-    MINUS           reduce using rule 10 (CTE -> CTE_ENT .)
-    GREATERTHAN     reduce using rule 10 (CTE -> CTE_ENT .)
-    LESSTHAN        reduce using rule 10 (CTE -> CTE_ENT .)
-    EQUAL           reduce using rule 10 (CTE -> CTE_ENT .)
-    NOTEQ           reduce using rule 10 (CTE -> CTE_ENT .)
-    SEMICOLON       reduce using rule 10 (CTE -> CTE_ENT .)
-    COMMA           reduce using rule 10 (CTE -> CTE_ENT .)
-    RIGHTPAREN      reduce using rule 10 (CTE -> CTE_ENT .)
+    RIGHTBRACE      reduce using rule 19 (func_end -> .)
 
+    func_end                       shift and go to state 99
 
 state 74
 
-    (11) CTE -> CTE_FLOAT .
+    (23) p_Follow -> ID COLON . TIPO commaCycleFuncs
+    (14) TIPO -> . INT
+    (15) TIPO -> . FLOAT
 
-    MULT            reduce using rule 11 (CTE -> CTE_FLOAT .)
-    DIVIDE          reduce using rule 11 (CTE -> CTE_FLOAT .)
-    PLUS            reduce using rule 11 (CTE -> CTE_FLOAT .)
-    MINUS           reduce using rule 11 (CTE -> CTE_FLOAT .)
-    GREATERTHAN     reduce using rule 11 (CTE -> CTE_FLOAT .)
-    LESSTHAN        reduce using rule 11 (CTE -> CTE_FLOAT .)
-    EQUAL           reduce using rule 11 (CTE -> CTE_FLOAT .)
-    NOTEQ           reduce using rule 11 (CTE -> CTE_FLOAT .)
-    SEMICOLON       reduce using rule 11 (CTE -> CTE_FLOAT .)
-    COMMA           reduce using rule 11 (CTE -> CTE_FLOAT .)
-    RIGHTPAREN      reduce using rule 11 (CTE -> CTE_FLOAT .)
+    INT             shift and go to state 15
+    FLOAT           shift and go to state 16
 
+    TIPO                           shift and go to state 100
 
 state 75
 
-    (47) LLAMADA -> ID LEFTPAREN args . RIGHTPAREN
+    (16) funcsHeader -> typeNull ID LEFTPAREN p_Follow RIGHTPAREN .
 
-    RIGHTPAREN      shift and go to state 100
+    LEFTBRACE       reduce using rule 16 (funcsHeader -> typeNull ID LEFTPAREN p_Follow RIGHTPAREN .)
 
 
 state 76
 
-    (49) args -> EXPRESION . argsCycle
-    (50) argsCycle -> .
-    (51) argsCycle -> . COMMA EXPRESION argsCycle
+    (60) p_VARS -> ID cycleID COLON TIPO SEMICOLON . cycleP_VARS
+    (63) cycleP_VARS -> .
+    (64) cycleP_VARS -> . p_VARS
+    (60) p_VARS -> . ID cycleID COLON TIPO SEMICOLON cycleP_VARS
 
-    RIGHTPAREN      reduce using rule 50 (argsCycle -> .)
-    COMMA           shift and go to state 102
+    NULA            reduce using rule 63 (cycleP_VARS -> .)
+    INT             reduce using rule 63 (cycleP_VARS -> .)
+    FLOAT           reduce using rule 63 (cycleP_VARS -> .)
+    START           reduce using rule 63 (cycleP_VARS -> .)
+    LEFTBRACE       reduce using rule 63 (cycleP_VARS -> .)
+    ID              shift and go to state 18
 
-    argsCycle                      shift and go to state 101
+    cycleP_VARS                    shift and go to state 101
+    p_VARS                         shift and go to state 102
 
 state 77
 
-    (67) CONDICION -> SI LEFTPAREN EXPRESION . RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
-    (68) CONDICION -> SI LEFTPAREN EXPRESION . RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
+    (31) ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .
 
-    RIGHTPAREN      shift and go to state 103
+    LEFTBRACKET     reduce using rule 31 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
+    RETURN          reduce using rule 31 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
+    ID              reduce using rule 31 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
+    IF              reduce using rule 31 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
+    WHILE           reduce using rule 31 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
+    PRINT           reduce using rule 31 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
+    RIGHTBRACE      reduce using rule 31 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
+    RIGHTBRACKET    reduce using rule 31 (ESTATUTO -> LEFTBRACKET ESTATUTO RIGHTBRACKET .)
 
 
 state 78
 
-    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN . EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
-    (28) EXPRESION -> . EXP signsExp
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (32) ESTATUTO -> RETURN EXPRESION SEMICOLON .
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    LEFTBRACKET     reduce using rule 32 (ESTATUTO -> RETURN EXPRESION SEMICOLON .)
+    RETURN          reduce using rule 32 (ESTATUTO -> RETURN EXPRESION SEMICOLON .)
+    ID              reduce using rule 32 (ESTATUTO -> RETURN EXPRESION SEMICOLON .)
+    IF              reduce using rule 32 (ESTATUTO -> RETURN EXPRESION SEMICOLON .)
+    WHILE           reduce using rule 32 (ESTATUTO -> RETURN EXPRESION SEMICOLON .)
+    PRINT           reduce using rule 32 (ESTATUTO -> RETURN EXPRESION SEMICOLON .)
+    RIGHTBRACE      reduce using rule 32 (ESTATUTO -> RETURN EXPRESION SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 32 (ESTATUTO -> RETURN EXPRESION SEMICOLON .)
 
-    EXPRESION                      shift and go to state 104
-    EXP                            shift and go to state 64
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 79
 
-    (58) IMPRIME -> ESCRIBE LEFTPAREN imp . cycleImp RIGHTPAREN SEMICOLON
-    (61) cycleImp -> .
-    (62) cycleImp -> . COMMA imp cycleImp
+    (33) EXPRESION -> EXP signsExp .
 
-    RIGHTPAREN      reduce using rule 61 (cycleImp -> .)
-    COMMA           shift and go to state 106
+    SEMICOLON       reduce using rule 33 (EXPRESION -> EXP signsExp .)
+    RIGHTPAREN      reduce using rule 33 (EXPRESION -> EXP signsExp .)
+    COMMA           reduce using rule 33 (EXPRESION -> EXP signsExp .)
 
-    cycleImp                       shift and go to state 105
 
 state 80
 
-    (59) imp -> LETRERO .
+    (39) EXP -> EXP PLUS . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    COMMA           reduce using rule 59 (imp -> LETRERO .)
-    RIGHTPAREN      reduce using rule 59 (imp -> LETRERO .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    TERMINO                        shift and go to state 103
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 81
 
-    (60) imp -> EXPRESION .
+    (40) EXP -> EXP MINUS . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    COMMA           reduce using rule 60 (imp -> EXPRESION .)
-    RIGHTPAREN      reduce using rule 60 (imp -> EXPRESION .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    TERMINO                        shift and go to state 104
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 82
 
-    (15) FUNCS -> funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON .
+    (35) signsExp -> GREATERTHAN . EXP
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    NULA            reduce using rule 15 (FUNCS -> funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON .)
-    ENTERO          reduce using rule 15 (FUNCS -> funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON .)
-    FLOTANTE        reduce using rule 15 (FUNCS -> funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON .)
-    INICIO          reduce using rule 15 (FUNCS -> funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    EXP                            shift and go to state 105
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 83
 
-    (19) p_Follow -> ID COLON TIPO . commaCycleFuncs
-    (20) commaCycleFuncs -> .
-    (21) commaCycleFuncs -> . COMMA p_Follow
+    (36) signsExp -> LESSTHAN . EXP
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    RIGHTPAREN      reduce using rule 20 (commaCycleFuncs -> .)
-    COMMA           shift and go to state 108
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
-    commaCycleFuncs                shift and go to state 107
+    EXP                            shift and go to state 106
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 84
 
-    (53) p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .
+    (37) signsExp -> EQUAL . EXP
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    NULA            reduce using rule 53 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
-    ENTERO          reduce using rule 53 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
-    FLOTANTE        reduce using rule 53 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
-    INICIO          reduce using rule 53 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
-    LEFTBRACE       reduce using rule 53 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    EXP                            shift and go to state 107
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 85
 
-    (57) cycleP_VARS -> p_VARS .
+    (38) signsExp -> NOTEQ . EXP
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    NULA            reduce using rule 57 (cycleP_VARS -> p_VARS .)
-    ENTERO          reduce using rule 57 (cycleP_VARS -> p_VARS .)
-    FLOTANTE        reduce using rule 57 (cycleP_VARS -> p_VARS .)
-    INICIO          reduce using rule 57 (cycleP_VARS -> p_VARS .)
-    LEFTBRACE       reduce using rule 57 (cycleP_VARS -> p_VARS .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    EXP                            shift and go to state 108
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 86
 
-    (9) ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .
+    (47) FACTOR -> PLUS skipID .
 
-    LEFTBRACKET     reduce using rule 9 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
-    ID              reduce using rule 9 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
-    SI              reduce using rule 9 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
-    MIENTRAS        reduce using rule 9 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
-    ESCRIBE         reduce using rule 9 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
-    RIGHTBRACE      reduce using rule 9 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
-    RIGHTBRACKET    reduce using rule 9 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
+    MULT            reduce using rule 47 (FACTOR -> PLUS skipID .)
+    DIVIDE          reduce using rule 47 (FACTOR -> PLUS skipID .)
+    PLUS            reduce using rule 47 (FACTOR -> PLUS skipID .)
+    MINUS           reduce using rule 47 (FACTOR -> PLUS skipID .)
+    GREATERTHAN     reduce using rule 47 (FACTOR -> PLUS skipID .)
+    LESSTHAN        reduce using rule 47 (FACTOR -> PLUS skipID .)
+    EQUAL           reduce using rule 47 (FACTOR -> PLUS skipID .)
+    NOTEQ           reduce using rule 47 (FACTOR -> PLUS skipID .)
+    SEMICOLON       reduce using rule 47 (FACTOR -> PLUS skipID .)
+    RIGHTPAREN      reduce using rule 47 (FACTOR -> PLUS skipID .)
+    COMMA           reduce using rule 47 (FACTOR -> PLUS skipID .)
 
 
 state 87
 
-    (28) EXPRESION -> EXP signsExp .
+    (50) skipID -> ID .
 
-    SEMICOLON       reduce using rule 28 (EXPRESION -> EXP signsExp .)
-    COMMA           reduce using rule 28 (EXPRESION -> EXP signsExp .)
-    RIGHTPAREN      reduce using rule 28 (EXPRESION -> EXP signsExp .)
+    MULT            reduce using rule 50 (skipID -> ID .)
+    DIVIDE          reduce using rule 50 (skipID -> ID .)
+    PLUS            reduce using rule 50 (skipID -> ID .)
+    MINUS           reduce using rule 50 (skipID -> ID .)
+    GREATERTHAN     reduce using rule 50 (skipID -> ID .)
+    LESSTHAN        reduce using rule 50 (skipID -> ID .)
+    EQUAL           reduce using rule 50 (skipID -> ID .)
+    NOTEQ           reduce using rule 50 (skipID -> ID .)
+    SEMICOLON       reduce using rule 50 (skipID -> ID .)
+    RIGHTPAREN      reduce using rule 50 (skipID -> ID .)
+    COMMA           reduce using rule 50 (skipID -> ID .)
 
 
 state 88
 
-    (34) EXP -> EXP PLUS . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (42) TERMINO -> TERMINO MULT . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
-    TERMINO                        shift and go to state 109
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
+    FACTOR                         shift and go to state 109
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 89
 
-    (35) EXP -> EXP MINUS . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (43) TERMINO -> TERMINO DIVIDE . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
-    TERMINO                        shift and go to state 110
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
+    FACTOR                         shift and go to state 110
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 90
 
-    (30) signsExp -> GREATERTHAN . EXP
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (48) FACTOR -> MINUS skipID .
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    MULT            reduce using rule 48 (FACTOR -> MINUS skipID .)
+    DIVIDE          reduce using rule 48 (FACTOR -> MINUS skipID .)
+    PLUS            reduce using rule 48 (FACTOR -> MINUS skipID .)
+    MINUS           reduce using rule 48 (FACTOR -> MINUS skipID .)
+    GREATERTHAN     reduce using rule 48 (FACTOR -> MINUS skipID .)
+    LESSTHAN        reduce using rule 48 (FACTOR -> MINUS skipID .)
+    EQUAL           reduce using rule 48 (FACTOR -> MINUS skipID .)
+    NOTEQ           reduce using rule 48 (FACTOR -> MINUS skipID .)
+    SEMICOLON       reduce using rule 48 (FACTOR -> MINUS skipID .)
+    RIGHTPAREN      reduce using rule 48 (FACTOR -> MINUS skipID .)
+    COMMA           reduce using rule 48 (FACTOR -> MINUS skipID .)
 
-    EXP                            shift and go to state 111
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 91
 
-    (31) signsExp -> LESSTHAN . EXP
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (45) FACTOR -> LEFTPAREN EXPRESION . RIGHTPAREN
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    RIGHTPAREN      shift and go to state 111
 
-    EXP                            shift and go to state 112
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 92
 
-    (32) signsExp -> EQUAL . EXP
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (11) ASIGNA -> ID ASSIGN EXPRESION . SEMICOLON
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    SEMICOLON       shift and go to state 112
 
-    EXP                            shift and go to state 113
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 93
 
-    (33) signsExp -> NOTEQ . EXP
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (52) LLAMADA -> ID ERA LEFTPAREN . args RIGHTPAREN
+    (54) args -> .
+    (55) args -> . arg_item argsCycle
+    (58) arg_item -> . EXPRESION
+    (33) EXPRESION -> . EXP signsExp
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    RIGHTPAREN      reduce using rule 54 (args -> .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
-    EXP                            shift and go to state 114
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
+    args                           shift and go to state 113
+    arg_item                       shift and go to state 114
+    EXPRESION                      shift and go to state 115
+    EXP                            shift and go to state 56
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 94
 
-    (42) FACTOR -> PLUS skipID .
+    (74) CONDICION -> IF LEFTPAREN EXPRESION . RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON
+    (75) CONDICION -> IF LEFTPAREN EXPRESION . RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON
 
-    MULT            reduce using rule 42 (FACTOR -> PLUS skipID .)
-    DIVIDE          reduce using rule 42 (FACTOR -> PLUS skipID .)
-    PLUS            reduce using rule 42 (FACTOR -> PLUS skipID .)
-    MINUS           reduce using rule 42 (FACTOR -> PLUS skipID .)
-    GREATERTHAN     reduce using rule 42 (FACTOR -> PLUS skipID .)
-    LESSTHAN        reduce using rule 42 (FACTOR -> PLUS skipID .)
-    EQUAL           reduce using rule 42 (FACTOR -> PLUS skipID .)
-    NOTEQ           reduce using rule 42 (FACTOR -> PLUS skipID .)
-    SEMICOLON       reduce using rule 42 (FACTOR -> PLUS skipID .)
-    COMMA           reduce using rule 42 (FACTOR -> PLUS skipID .)
-    RIGHTPAREN      reduce using rule 42 (FACTOR -> PLUS skipID .)
+    RIGHTPAREN      shift and go to state 116
 
 
 state 95
 
-    (45) skipID -> ID .
+    (70) CICLO -> WHILE ciclo_start LEFTPAREN . EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON
+    (33) EXPRESION -> . EXP signsExp
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    MULT            reduce using rule 45 (skipID -> ID .)
-    DIVIDE          reduce using rule 45 (skipID -> ID .)
-    PLUS            reduce using rule 45 (skipID -> ID .)
-    MINUS           reduce using rule 45 (skipID -> ID .)
-    GREATERTHAN     reduce using rule 45 (skipID -> ID .)
-    LESSTHAN        reduce using rule 45 (skipID -> ID .)
-    EQUAL           reduce using rule 45 (skipID -> ID .)
-    NOTEQ           reduce using rule 45 (skipID -> ID .)
-    SEMICOLON       reduce using rule 45 (skipID -> ID .)
-    COMMA           reduce using rule 45 (skipID -> ID .)
-    RIGHTPAREN      reduce using rule 45 (skipID -> ID .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
+    EXPRESION                      shift and go to state 117
+    EXP                            shift and go to state 56
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 96
 
-    (37) TERMINO -> TERMINO MULT . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (65) IMPRIME -> PRINT LEFTPAREN imp . cycleImp RIGHTPAREN SEMICOLON
+    (68) cycleImp -> .
+    (69) cycleImp -> . COMMA imp cycleImp
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    RIGHTPAREN      reduce using rule 68 (cycleImp -> .)
+    COMMA           shift and go to state 119
 
-    FACTOR                         shift and go to state 115
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
+    cycleImp                       shift and go to state 118
 
 state 97
 
-    (38) TERMINO -> TERMINO DIVIDE . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (66) imp -> LETRERO .
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    COMMA           reduce using rule 66 (imp -> LETRERO .)
+    RIGHTPAREN      reduce using rule 66 (imp -> LETRERO .)
 
-    FACTOR                         shift and go to state 116
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 98
 
-    (43) FACTOR -> MINUS skipID .
+    (67) imp -> EXPRESION .
 
-    MULT            reduce using rule 43 (FACTOR -> MINUS skipID .)
-    DIVIDE          reduce using rule 43 (FACTOR -> MINUS skipID .)
-    PLUS            reduce using rule 43 (FACTOR -> MINUS skipID .)
-    MINUS           reduce using rule 43 (FACTOR -> MINUS skipID .)
-    GREATERTHAN     reduce using rule 43 (FACTOR -> MINUS skipID .)
-    LESSTHAN        reduce using rule 43 (FACTOR -> MINUS skipID .)
-    EQUAL           reduce using rule 43 (FACTOR -> MINUS skipID .)
-    NOTEQ           reduce using rule 43 (FACTOR -> MINUS skipID .)
-    SEMICOLON       reduce using rule 43 (FACTOR -> MINUS skipID .)
-    COMMA           reduce using rule 43 (FACTOR -> MINUS skipID .)
-    RIGHTPAREN      reduce using rule 43 (FACTOR -> MINUS skipID .)
+    COMMA           reduce using rule 67 (imp -> EXPRESION .)
+    RIGHTPAREN      reduce using rule 67 (imp -> EXPRESION .)
 
 
 state 99
 
-    (40) FACTOR -> LEFTPAREN EXPRESION . RIGHTPAREN
+    (17) FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end . RIGHTBRACE SEMICOLON
 
-    RIGHTPAREN      shift and go to state 117
+    RIGHTBRACE      shift and go to state 120
 
 
 state 100
 
-    (47) LLAMADA -> ID LEFTPAREN args RIGHTPAREN .
+    (23) p_Follow -> ID COLON TIPO . commaCycleFuncs
+    (24) commaCycleFuncs -> .
+    (25) commaCycleFuncs -> . COMMA p_Follow
 
-    SEMICOLON       reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    MULT            reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    DIVIDE          reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    PLUS            reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    MINUS           reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    GREATERTHAN     reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    LESSTHAN        reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    EQUAL           reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    NOTEQ           reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    COMMA           reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
-    RIGHTPAREN      reduce using rule 47 (LLAMADA -> ID LEFTPAREN args RIGHTPAREN .)
+    RIGHTPAREN      reduce using rule 24 (commaCycleFuncs -> .)
+    COMMA           shift and go to state 122
 
+    commaCycleFuncs                shift and go to state 121
 
 state 101
 
-    (49) args -> EXPRESION argsCycle .
+    (60) p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .
 
-    RIGHTPAREN      reduce using rule 49 (args -> EXPRESION argsCycle .)
+    NULA            reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
+    INT             reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
+    FLOAT           reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
+    START           reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
+    LEFTBRACE       reduce using rule 60 (p_VARS -> ID cycleID COLON TIPO SEMICOLON cycleP_VARS .)
 
 
 state 102
 
-    (51) argsCycle -> COMMA . EXPRESION argsCycle
-    (28) EXPRESION -> . EXP signsExp
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (64) cycleP_VARS -> p_VARS .
 
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    NULA            reduce using rule 64 (cycleP_VARS -> p_VARS .)
+    INT             reduce using rule 64 (cycleP_VARS -> p_VARS .)
+    FLOAT           reduce using rule 64 (cycleP_VARS -> p_VARS .)
+    START           reduce using rule 64 (cycleP_VARS -> p_VARS .)
+    LEFTBRACE       reduce using rule 64 (cycleP_VARS -> p_VARS .)
 
-    EXPRESION                      shift and go to state 118
-    EXP                            shift and go to state 64
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 103
 
-    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN . if_goToF CUERPO if_noElse SEMICOLON
-    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN . if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON
-    (69) if_goToF -> .
+    (39) EXP -> EXP PLUS TERMINO .
+    (42) TERMINO -> TERMINO . MULT FACTOR
+    (43) TERMINO -> TERMINO . DIVIDE FACTOR
 
-    LEFTBRACE       reduce using rule 69 (if_goToF -> .)
+    PLUS            reduce using rule 39 (EXP -> EXP PLUS TERMINO .)
+    MINUS           reduce using rule 39 (EXP -> EXP PLUS TERMINO .)
+    GREATERTHAN     reduce using rule 39 (EXP -> EXP PLUS TERMINO .)
+    LESSTHAN        reduce using rule 39 (EXP -> EXP PLUS TERMINO .)
+    EQUAL           reduce using rule 39 (EXP -> EXP PLUS TERMINO .)
+    NOTEQ           reduce using rule 39 (EXP -> EXP PLUS TERMINO .)
+    SEMICOLON       reduce using rule 39 (EXP -> EXP PLUS TERMINO .)
+    RIGHTPAREN      reduce using rule 39 (EXP -> EXP PLUS TERMINO .)
+    COMMA           reduce using rule 39 (EXP -> EXP PLUS TERMINO .)
+    MULT            shift and go to state 88
+    DIVIDE          shift and go to state 89
 
-    if_goToF                       shift and go to state 119
 
 state 104
 
-    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION . RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
+    (40) EXP -> EXP MINUS TERMINO .
+    (42) TERMINO -> TERMINO . MULT FACTOR
+    (43) TERMINO -> TERMINO . DIVIDE FACTOR
 
-    RIGHTPAREN      shift and go to state 120
+    PLUS            reduce using rule 40 (EXP -> EXP MINUS TERMINO .)
+    MINUS           reduce using rule 40 (EXP -> EXP MINUS TERMINO .)
+    GREATERTHAN     reduce using rule 40 (EXP -> EXP MINUS TERMINO .)
+    LESSTHAN        reduce using rule 40 (EXP -> EXP MINUS TERMINO .)
+    EQUAL           reduce using rule 40 (EXP -> EXP MINUS TERMINO .)
+    NOTEQ           reduce using rule 40 (EXP -> EXP MINUS TERMINO .)
+    SEMICOLON       reduce using rule 40 (EXP -> EXP MINUS TERMINO .)
+    RIGHTPAREN      reduce using rule 40 (EXP -> EXP MINUS TERMINO .)
+    COMMA           reduce using rule 40 (EXP -> EXP MINUS TERMINO .)
+    MULT            shift and go to state 88
+    DIVIDE          shift and go to state 89
 
 
 state 105
 
-    (58) IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp . RIGHTPAREN SEMICOLON
+    (35) signsExp -> GREATERTHAN EXP .
+    (39) EXP -> EXP . PLUS TERMINO
+    (40) EXP -> EXP . MINUS TERMINO
 
-    RIGHTPAREN      shift and go to state 121
+    SEMICOLON       reduce using rule 35 (signsExp -> GREATERTHAN EXP .)
+    RIGHTPAREN      reduce using rule 35 (signsExp -> GREATERTHAN EXP .)
+    COMMA           reduce using rule 35 (signsExp -> GREATERTHAN EXP .)
+    PLUS            shift and go to state 80
+    MINUS           shift and go to state 81
 
 
 state 106
 
-    (62) cycleImp -> COMMA . imp cycleImp
-    (59) imp -> . LETRERO
-    (60) imp -> . EXPRESION
-    (28) EXPRESION -> . EXP signsExp
-    (34) EXP -> . EXP PLUS TERMINO
-    (35) EXP -> . EXP MINUS TERMINO
-    (36) EXP -> . TERMINO
-    (37) TERMINO -> . TERMINO MULT FACTOR
-    (38) TERMINO -> . TERMINO DIVIDE FACTOR
-    (39) TERMINO -> . FACTOR
-    (40) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
-    (41) FACTOR -> . LLAMADA
-    (42) FACTOR -> . PLUS skipID
-    (43) FACTOR -> . MINUS skipID
-    (44) FACTOR -> . skipID
-    (47) LLAMADA -> . ID LEFTPAREN args RIGHTPAREN
-    (45) skipID -> . ID
-    (46) skipID -> . CTE
-    (10) CTE -> . CTE_ENT
-    (11) CTE -> . CTE_FLOAT
+    (36) signsExp -> LESSTHAN EXP .
+    (39) EXP -> EXP . PLUS TERMINO
+    (40) EXP -> EXP . MINUS TERMINO
 
-    LETRERO         shift and go to state 80
-    LEFTPAREN       shift and go to state 69
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 67
-    ID              shift and go to state 62
-    CTE_ENT         shift and go to state 73
-    CTE_FLOAT       shift and go to state 74
+    SEMICOLON       reduce using rule 36 (signsExp -> LESSTHAN EXP .)
+    RIGHTPAREN      reduce using rule 36 (signsExp -> LESSTHAN EXP .)
+    COMMA           reduce using rule 36 (signsExp -> LESSTHAN EXP .)
+    PLUS            shift and go to state 80
+    MINUS           shift and go to state 81
 
-    imp                            shift and go to state 122
-    EXPRESION                      shift and go to state 81
-    EXP                            shift and go to state 64
-    TERMINO                        shift and go to state 66
-    FACTOR                         shift and go to state 68
-    LLAMADA                        shift and go to state 70
-    skipID                         shift and go to state 71
-    CTE                            shift and go to state 72
 
 state 107
 
-    (19) p_Follow -> ID COLON TIPO commaCycleFuncs .
+    (37) signsExp -> EQUAL EXP .
+    (39) EXP -> EXP . PLUS TERMINO
+    (40) EXP -> EXP . MINUS TERMINO
 
-    RIGHTPAREN      reduce using rule 19 (p_Follow -> ID COLON TIPO commaCycleFuncs .)
+    SEMICOLON       reduce using rule 37 (signsExp -> EQUAL EXP .)
+    RIGHTPAREN      reduce using rule 37 (signsExp -> EQUAL EXP .)
+    COMMA           reduce using rule 37 (signsExp -> EQUAL EXP .)
+    PLUS            shift and go to state 80
+    MINUS           shift and go to state 81
 
 
 state 108
 
-    (21) commaCycleFuncs -> COMMA . p_Follow
-    (18) p_Follow -> .
-    (19) p_Follow -> . ID COLON TIPO commaCycleFuncs
+    (38) signsExp -> NOTEQ EXP .
+    (39) EXP -> EXP . PLUS TERMINO
+    (40) EXP -> EXP . MINUS TERMINO
 
-    RIGHTPAREN      reduce using rule 18 (p_Follow -> .)
-    ID              shift and go to state 44
+    SEMICOLON       reduce using rule 38 (signsExp -> NOTEQ EXP .)
+    RIGHTPAREN      reduce using rule 38 (signsExp -> NOTEQ EXP .)
+    COMMA           reduce using rule 38 (signsExp -> NOTEQ EXP .)
+    PLUS            shift and go to state 80
+    MINUS           shift and go to state 81
 
-    p_Follow                       shift and go to state 123
 
 state 109
 
-    (34) EXP -> EXP PLUS TERMINO .
-    (37) TERMINO -> TERMINO . MULT FACTOR
-    (38) TERMINO -> TERMINO . DIVIDE FACTOR
+    (42) TERMINO -> TERMINO MULT FACTOR .
 
-    PLUS            reduce using rule 34 (EXP -> EXP PLUS TERMINO .)
-    MINUS           reduce using rule 34 (EXP -> EXP PLUS TERMINO .)
-    GREATERTHAN     reduce using rule 34 (EXP -> EXP PLUS TERMINO .)
-    LESSTHAN        reduce using rule 34 (EXP -> EXP PLUS TERMINO .)
-    EQUAL           reduce using rule 34 (EXP -> EXP PLUS TERMINO .)
-    NOTEQ           reduce using rule 34 (EXP -> EXP PLUS TERMINO .)
-    SEMICOLON       reduce using rule 34 (EXP -> EXP PLUS TERMINO .)
-    COMMA           reduce using rule 34 (EXP -> EXP PLUS TERMINO .)
-    RIGHTPAREN      reduce using rule 34 (EXP -> EXP PLUS TERMINO .)
-    MULT            shift and go to state 96
-    DIVIDE          shift and go to state 97
+    MULT            reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    DIVIDE          reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    PLUS            reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    MINUS           reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    GREATERTHAN     reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    LESSTHAN        reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    EQUAL           reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    NOTEQ           reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    SEMICOLON       reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    RIGHTPAREN      reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
+    COMMA           reduce using rule 42 (TERMINO -> TERMINO MULT FACTOR .)
 
 
 state 110
 
-    (35) EXP -> EXP MINUS TERMINO .
-    (37) TERMINO -> TERMINO . MULT FACTOR
-    (38) TERMINO -> TERMINO . DIVIDE FACTOR
+    (43) TERMINO -> TERMINO DIVIDE FACTOR .
 
-    PLUS            reduce using rule 35 (EXP -> EXP MINUS TERMINO .)
-    MINUS           reduce using rule 35 (EXP -> EXP MINUS TERMINO .)
-    GREATERTHAN     reduce using rule 35 (EXP -> EXP MINUS TERMINO .)
-    LESSTHAN        reduce using rule 35 (EXP -> EXP MINUS TERMINO .)
-    EQUAL           reduce using rule 35 (EXP -> EXP MINUS TERMINO .)
-    NOTEQ           reduce using rule 35 (EXP -> EXP MINUS TERMINO .)
-    SEMICOLON       reduce using rule 35 (EXP -> EXP MINUS TERMINO .)
-    COMMA           reduce using rule 35 (EXP -> EXP MINUS TERMINO .)
-    RIGHTPAREN      reduce using rule 35 (EXP -> EXP MINUS TERMINO .)
-    MULT            shift and go to state 96
-    DIVIDE          shift and go to state 97
+    MULT            reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    DIVIDE          reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    PLUS            reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    MINUS           reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    GREATERTHAN     reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    LESSTHAN        reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    EQUAL           reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    NOTEQ           reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    SEMICOLON       reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    RIGHTPAREN      reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    COMMA           reduce using rule 43 (TERMINO -> TERMINO DIVIDE FACTOR .)
 
 
 state 111
 
-    (30) signsExp -> GREATERTHAN EXP .
-    (34) EXP -> EXP . PLUS TERMINO
-    (35) EXP -> EXP . MINUS TERMINO
+    (45) FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .
 
-    SEMICOLON       reduce using rule 30 (signsExp -> GREATERTHAN EXP .)
-    COMMA           reduce using rule 30 (signsExp -> GREATERTHAN EXP .)
-    RIGHTPAREN      reduce using rule 30 (signsExp -> GREATERTHAN EXP .)
-    PLUS            shift and go to state 88
-    MINUS           shift and go to state 89
+    MULT            reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    DIVIDE          reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    PLUS            reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    MINUS           reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    GREATERTHAN     reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    LESSTHAN        reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    EQUAL           reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    NOTEQ           reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    SEMICOLON       reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    RIGHTPAREN      reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    COMMA           reduce using rule 45 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
 
 
 state 112
 
-    (31) signsExp -> LESSTHAN EXP .
-    (34) EXP -> EXP . PLUS TERMINO
-    (35) EXP -> EXP . MINUS TERMINO
+    (11) ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .
 
-    SEMICOLON       reduce using rule 31 (signsExp -> LESSTHAN EXP .)
-    COMMA           reduce using rule 31 (signsExp -> LESSTHAN EXP .)
-    RIGHTPAREN      reduce using rule 31 (signsExp -> LESSTHAN EXP .)
-    PLUS            shift and go to state 88
-    MINUS           shift and go to state 89
+    LEFTBRACKET     reduce using rule 11 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
+    RETURN          reduce using rule 11 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
+    ID              reduce using rule 11 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
+    IF              reduce using rule 11 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
+    WHILE           reduce using rule 11 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
+    PRINT           reduce using rule 11 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
+    RIGHTBRACE      reduce using rule 11 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 11 (ASIGNA -> ID ASSIGN EXPRESION SEMICOLON .)
 
 
 state 113
 
-    (32) signsExp -> EQUAL EXP .
-    (34) EXP -> EXP . PLUS TERMINO
-    (35) EXP -> EXP . MINUS TERMINO
+    (52) LLAMADA -> ID ERA LEFTPAREN args . RIGHTPAREN
 
-    SEMICOLON       reduce using rule 32 (signsExp -> EQUAL EXP .)
-    COMMA           reduce using rule 32 (signsExp -> EQUAL EXP .)
-    RIGHTPAREN      reduce using rule 32 (signsExp -> EQUAL EXP .)
-    PLUS            shift and go to state 88
-    MINUS           shift and go to state 89
+    RIGHTPAREN      shift and go to state 123
 
 
 state 114
 
-    (33) signsExp -> NOTEQ EXP .
-    (34) EXP -> EXP . PLUS TERMINO
-    (35) EXP -> EXP . MINUS TERMINO
+    (55) args -> arg_item . argsCycle
+    (56) argsCycle -> .
+    (57) argsCycle -> . COMMA arg_item argsCycle
 
-    SEMICOLON       reduce using rule 33 (signsExp -> NOTEQ EXP .)
-    COMMA           reduce using rule 33 (signsExp -> NOTEQ EXP .)
-    RIGHTPAREN      reduce using rule 33 (signsExp -> NOTEQ EXP .)
-    PLUS            shift and go to state 88
-    MINUS           shift and go to state 89
+    RIGHTPAREN      reduce using rule 56 (argsCycle -> .)
+    COMMA           shift and go to state 125
 
+    argsCycle                      shift and go to state 124
 
 state 115
 
-    (37) TERMINO -> TERMINO MULT FACTOR .
+    (58) arg_item -> EXPRESION .
 
-    MULT            reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    DIVIDE          reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    PLUS            reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    MINUS           reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    GREATERTHAN     reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    LESSTHAN        reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    EQUAL           reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    NOTEQ           reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    SEMICOLON       reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    COMMA           reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
-    RIGHTPAREN      reduce using rule 37 (TERMINO -> TERMINO MULT FACTOR .)
+    COMMA           reduce using rule 58 (arg_item -> EXPRESION .)
+    RIGHTPAREN      reduce using rule 58 (arg_item -> EXPRESION .)
 
 
 state 116
 
-    (38) TERMINO -> TERMINO DIVIDE FACTOR .
+    (74) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN . if_goToF CUERPO if_noElse SEMICOLON
+    (75) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN . if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON
+    (76) if_goToF -> .
 
-    MULT            reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    DIVIDE          reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    PLUS            reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    MINUS           reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    GREATERTHAN     reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    LESSTHAN        reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    EQUAL           reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    NOTEQ           reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    SEMICOLON       reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    COMMA           reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
-    RIGHTPAREN      reduce using rule 38 (TERMINO -> TERMINO DIVIDE FACTOR .)
+    LEFTBRACE       reduce using rule 76 (if_goToF -> .)
 
+    if_goToF                       shift and go to state 126
 
 state 117
 
-    (40) FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .
+    (70) CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION . RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON
 
-    MULT            reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    DIVIDE          reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    PLUS            reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    MINUS           reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    GREATERTHAN     reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    LESSTHAN        reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    EQUAL           reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    NOTEQ           reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    SEMICOLON       reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    COMMA           reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
-    RIGHTPAREN      reduce using rule 40 (FACTOR -> LEFTPAREN EXPRESION RIGHTPAREN .)
+    RIGHTPAREN      shift and go to state 127
 
 
 state 118
 
-    (51) argsCycle -> COMMA EXPRESION . argsCycle
-    (50) argsCycle -> .
-    (51) argsCycle -> . COMMA EXPRESION argsCycle
+    (65) IMPRIME -> PRINT LEFTPAREN imp cycleImp . RIGHTPAREN SEMICOLON
 
-    RIGHTPAREN      reduce using rule 50 (argsCycle -> .)
-    COMMA           shift and go to state 102
+    RIGHTPAREN      shift and go to state 128
 
-    argsCycle                      shift and go to state 124
 
 state 119
 
-    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF . CUERPO if_noElse SEMICOLON
-    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF . CUERPO SINO if_else CUERPO if_else_end SEMICOLON
-    (6) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
+    (69) cycleImp -> COMMA . imp cycleImp
+    (66) imp -> . LETRERO
+    (67) imp -> . EXPRESION
+    (33) EXPRESION -> . EXP signsExp
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    LEFTBRACE       shift and go to state 25
+    LETRERO         shift and go to state 97
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
-    CUERPO                         shift and go to state 125
+    imp                            shift and go to state 129
+    EXPRESION                      shift and go to state 98
+    EXP                            shift and go to state 56
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 120
 
-    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN . ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON
-    (65) ciclo_goToF -> .
+    (17) FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE . SEMICOLON
 
-    HAZ             reduce using rule 65 (ciclo_goToF -> .)
+    SEMICOLON       shift and go to state 130
 
-    ciclo_goToF                    shift and go to state 126
 
 state 121
 
-    (58) IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN . SEMICOLON
+    (23) p_Follow -> ID COLON TIPO commaCycleFuncs .
 
-    SEMICOLON       shift and go to state 127
+    RIGHTPAREN      reduce using rule 23 (p_Follow -> ID COLON TIPO commaCycleFuncs .)
 
 
 state 122
 
-    (62) cycleImp -> COMMA imp . cycleImp
-    (61) cycleImp -> .
-    (62) cycleImp -> . COMMA imp cycleImp
+    (25) commaCycleFuncs -> COMMA . p_Follow
+    (22) p_Follow -> .
+    (23) p_Follow -> . ID COLON TIPO commaCycleFuncs
 
-    RIGHTPAREN      reduce using rule 61 (cycleImp -> .)
-    COMMA           shift and go to state 106
+    RIGHTPAREN      reduce using rule 22 (p_Follow -> .)
+    ID              shift and go to state 47
 
-    cycleImp                       shift and go to state 128
+    p_Follow                       shift and go to state 131
 
 state 123
 
-    (21) commaCycleFuncs -> COMMA p_Follow .
+    (52) LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .
 
-    RIGHTPAREN      reduce using rule 21 (commaCycleFuncs -> COMMA p_Follow .)
+    SEMICOLON       reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    MULT            reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    DIVIDE          reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    PLUS            reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    MINUS           reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    GREATERTHAN     reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    LESSTHAN        reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    EQUAL           reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    NOTEQ           reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    RIGHTPAREN      reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
+    COMMA           reduce using rule 52 (LLAMADA -> ID ERA LEFTPAREN args RIGHTPAREN .)
 
 
 state 124
 
-    (51) argsCycle -> COMMA EXPRESION argsCycle .
+    (55) args -> arg_item argsCycle .
 
-    RIGHTPAREN      reduce using rule 51 (argsCycle -> COMMA EXPRESION argsCycle .)
+    RIGHTPAREN      reduce using rule 55 (args -> arg_item argsCycle .)
 
 
 state 125
 
-    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO . if_noElse SEMICOLON
-    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO . SINO if_else CUERPO if_else_end SEMICOLON
-    (70) if_noElse -> .
+    (57) argsCycle -> COMMA . arg_item argsCycle
+    (58) arg_item -> . EXPRESION
+    (33) EXPRESION -> . EXP signsExp
+    (39) EXP -> . EXP PLUS TERMINO
+    (40) EXP -> . EXP MINUS TERMINO
+    (41) EXP -> . TERMINO
+    (42) TERMINO -> . TERMINO MULT FACTOR
+    (43) TERMINO -> . TERMINO DIVIDE FACTOR
+    (44) TERMINO -> . FACTOR
+    (45) FACTOR -> . LEFTPAREN EXPRESION RIGHTPAREN
+    (46) FACTOR -> . LLAMADA
+    (47) FACTOR -> . PLUS skipID
+    (48) FACTOR -> . MINUS skipID
+    (49) FACTOR -> . skipID
+    (52) LLAMADA -> . ID ERA LEFTPAREN args RIGHTPAREN
+    (50) skipID -> . ID
+    (51) skipID -> . CTE
+    (12) CTE -> . CTE_INT
+    (13) CTE -> . CTE_FLOAT
 
-    SINO            shift and go to state 130
-    SEMICOLON       reduce using rule 70 (if_noElse -> .)
+    LEFTPAREN       shift and go to state 61
+    PLUS            shift and go to state 57
+    MINUS           shift and go to state 59
+    ID              shift and go to state 64
+    CTE_INT         shift and go to state 66
+    CTE_FLOAT       shift and go to state 67
 
-    if_noElse                      shift and go to state 129
+    arg_item                       shift and go to state 132
+    EXPRESION                      shift and go to state 115
+    EXP                            shift and go to state 56
+    TERMINO                        shift and go to state 58
+    FACTOR                         shift and go to state 60
+    LLAMADA                        shift and go to state 62
+    skipID                         shift and go to state 63
+    CTE                            shift and go to state 65
 
 state 126
 
-    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF . HAZ CUERPO ciclo_end SEMICOLON
+    (74) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF . CUERPO if_noElse SEMICOLON
+    (75) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF . CUERPO ELSE if_else CUERPO if_else_end SEMICOLON
+    (8) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
 
-    HAZ             shift and go to state 131
+    LEFTBRACE       shift and go to state 27
 
+    CUERPO                         shift and go to state 133
 
 state 127
 
-    (58) IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .
+    (70) CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN . ciclo_goToF DO CUERPO ciclo_end SEMICOLON
+    (72) ciclo_goToF -> .
 
-    LEFTBRACKET     reduce using rule 58 (IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
-    ID              reduce using rule 58 (IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
-    SI              reduce using rule 58 (IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
-    MIENTRAS        reduce using rule 58 (IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
-    ESCRIBE         reduce using rule 58 (IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
-    RIGHTBRACE      reduce using rule 58 (IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
-    RIGHTBRACKET    reduce using rule 58 (IMPRIME -> ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
+    DO              reduce using rule 72 (ciclo_goToF -> .)
 
+    ciclo_goToF                    shift and go to state 134
 
 state 128
 
-    (62) cycleImp -> COMMA imp cycleImp .
+    (65) IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN . SEMICOLON
 
-    RIGHTPAREN      reduce using rule 62 (cycleImp -> COMMA imp cycleImp .)
+    SEMICOLON       shift and go to state 135
 
 
 state 129
 
-    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse . SEMICOLON
+    (69) cycleImp -> COMMA imp . cycleImp
+    (68) cycleImp -> .
+    (69) cycleImp -> . COMMA imp cycleImp
 
-    SEMICOLON       shift and go to state 132
+    RIGHTPAREN      reduce using rule 68 (cycleImp -> .)
+    COMMA           shift and go to state 119
 
+    cycleImp                       shift and go to state 136
 
 state 130
 
-    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO . if_else CUERPO if_else_end SEMICOLON
-    (71) if_else -> .
+    (17) FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .
 
-    LEFTBRACE       reduce using rule 71 (if_else -> .)
+    NULA            reduce using rule 17 (FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .)
+    INT             reduce using rule 17 (FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .)
+    FLOAT           reduce using rule 17 (FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .)
+    START           reduce using rule 17 (FUNCS -> funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON .)
 
-    if_else                        shift and go to state 133
 
 state 131
 
-    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ . CUERPO ciclo_end SEMICOLON
-    (6) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
+    (25) commaCycleFuncs -> COMMA p_Follow .
 
-    LEFTBRACE       shift and go to state 25
+    RIGHTPAREN      reduce using rule 25 (commaCycleFuncs -> COMMA p_Follow .)
 
-    CUERPO                         shift and go to state 134
 
 state 132
 
-    (67) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .
+    (57) argsCycle -> COMMA arg_item . argsCycle
+    (56) argsCycle -> .
+    (57) argsCycle -> . COMMA arg_item argsCycle
 
-    LEFTBRACKET     reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
-    ID              reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
-    SI              reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
-    MIENTRAS        reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
-    ESCRIBE         reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
-    RIGHTBRACE      reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
-    RIGHTBRACKET    reduce using rule 67 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    RIGHTPAREN      reduce using rule 56 (argsCycle -> .)
+    COMMA           shift and go to state 125
 
+    argsCycle                      shift and go to state 137
 
 state 133
 
-    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else . CUERPO if_else_end SEMICOLON
-    (6) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
+    (74) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO . if_noElse SEMICOLON
+    (75) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO . ELSE if_else CUERPO if_else_end SEMICOLON
+    (77) if_noElse -> .
 
-    LEFTBRACE       shift and go to state 25
+    ELSE            shift and go to state 139
+    SEMICOLON       reduce using rule 77 (if_noElse -> .)
 
-    CUERPO                         shift and go to state 135
+    if_noElse                      shift and go to state 138
 
 state 134
 
-    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO . ciclo_end SEMICOLON
-    (66) ciclo_end -> .
+    (70) CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF . DO CUERPO ciclo_end SEMICOLON
 
-    SEMICOLON       reduce using rule 66 (ciclo_end -> .)
+    DO              shift and go to state 140
 
-    ciclo_end                      shift and go to state 136
 
 state 135
 
-    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO . if_else_end SEMICOLON
-    (72) if_else_end -> .
+    (65) IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .
 
-    SEMICOLON       reduce using rule 72 (if_else_end -> .)
+    LEFTBRACKET     reduce using rule 65 (IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
+    RETURN          reduce using rule 65 (IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
+    ID              reduce using rule 65 (IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
+    IF              reduce using rule 65 (IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
+    WHILE           reduce using rule 65 (IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
+    PRINT           reduce using rule 65 (IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
+    RIGHTBRACE      reduce using rule 65 (IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 65 (IMPRIME -> PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON .)
 
-    if_else_end                    shift and go to state 137
 
 state 136
 
-    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end . SEMICOLON
+    (69) cycleImp -> COMMA imp cycleImp .
 
-    SEMICOLON       shift and go to state 138
+    RIGHTPAREN      reduce using rule 69 (cycleImp -> COMMA imp cycleImp .)
 
 
 state 137
 
-    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end . SEMICOLON
+    (57) argsCycle -> COMMA arg_item argsCycle .
 
-    SEMICOLON       shift and go to state 139
+    RIGHTPAREN      reduce using rule 57 (argsCycle -> COMMA arg_item argsCycle .)
 
 
 state 138
 
-    (63) CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .
+    (74) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse . SEMICOLON
 
-    LEFTBRACKET     reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
-    ID              reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
-    SI              reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
-    MIENTRAS        reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
-    ESCRIBE         reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
-    RIGHTBRACE      reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
-    RIGHTBRACKET    reduce using rule 63 (CICLO -> MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON .)
+    SEMICOLON       shift and go to state 141
 
 
 state 139
 
-    (68) CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .
+    (75) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE . if_else CUERPO if_else_end SEMICOLON
+    (78) if_else -> .
 
-    LEFTBRACKET     reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
-    ID              reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
-    SI              reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
-    MIENTRAS        reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
-    ESCRIBE         reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
-    RIGHTBRACE      reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
-    RIGHTBRACKET    reduce using rule 68 (CONDICION -> SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON .)
+    LEFTBRACE       reduce using rule 78 (if_else -> .)
+
+    if_else                        shift and go to state 142
+
+state 140
+
+    (70) CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO . CUERPO ciclo_end SEMICOLON
+    (8) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
+
+    LEFTBRACE       shift and go to state 27
+
+    CUERPO                         shift and go to state 143
+
+state 141
+
+    (74) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .
+
+    LEFTBRACKET     reduce using rule 74 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    RETURN          reduce using rule 74 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    ID              reduce using rule 74 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    IF              reduce using rule 74 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    WHILE           reduce using rule 74 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    PRINT           reduce using rule 74 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    RIGHTBRACE      reduce using rule 74 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 74 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON .)
+
+
+state 142
+
+    (75) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else . CUERPO if_else_end SEMICOLON
+    (8) CUERPO -> . LEFTBRACE cycleEst RIGHTBRACE
+
+    LEFTBRACE       shift and go to state 27
+
+    CUERPO                         shift and go to state 144
+
+state 143
+
+    (70) CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO . ciclo_end SEMICOLON
+    (73) ciclo_end -> .
+
+    SEMICOLON       reduce using rule 73 (ciclo_end -> .)
+
+    ciclo_end                      shift and go to state 145
+
+state 144
+
+    (75) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO . if_else_end SEMICOLON
+    (79) if_else_end -> .
+
+    SEMICOLON       reduce using rule 79 (if_else_end -> .)
+
+    if_else_end                    shift and go to state 146
+
+state 145
+
+    (70) CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end . SEMICOLON
+
+    SEMICOLON       shift and go to state 147
+
+
+state 146
+
+    (75) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end . SEMICOLON
+
+    SEMICOLON       shift and go to state 148
+
+
+state 147
+
+    (70) CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON .
+
+    LEFTBRACKET     reduce using rule 70 (CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON .)
+    RETURN          reduce using rule 70 (CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON .)
+    ID              reduce using rule 70 (CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON .)
+    IF              reduce using rule 70 (CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON .)
+    WHILE           reduce using rule 70 (CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON .)
+    PRINT           reduce using rule 70 (CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON .)
+    RIGHTBRACE      reduce using rule 70 (CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 70 (CICLO -> WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON .)
+
+
+state 148
+
+    (75) CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON .
+
+    LEFTBRACKET     reduce using rule 75 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON .)
+    RETURN          reduce using rule 75 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON .)
+    ID              reduce using rule 75 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON .)
+    IF              reduce using rule 75 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON .)
+    WHILE           reduce using rule 75 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON .)
+    PRINT           reduce using rule 75 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON .)
+    RIGHTBRACE      reduce using rule 75 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON .)
+    RIGHTBRACKET    reduce using rule 75 (CONDICION -> IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON .)
 

@@ -3,23 +3,24 @@ import ply.lex as lex
 # Palabras reservadas
 reserved = {
     'programa' : 'PROGRAMA',
-    'inicio'   : 'INICIO',
-    'fin'      : 'FIN',
+    'start'   : 'START',
+    'end'      : 'END',
     'vars'     : 'VARS',
-    'entero'   : 'ENTERO',
-    'flotante' : 'FLOTANTE',
+    'int'   : 'INT',
+    'float' : 'FLOAT',
     'nula'     : 'NULA',
-    'escribe'  : 'ESCRIBE',
-    'mientras' : 'MIENTRAS',
-    'haz'      : 'HAZ',
-    'si'       : 'SI',
-    'sino'     : 'SINO',
+    'print'  : 'PRINT',
+    'while' : 'WHILE',
+    'do'      : 'DO',
+    'if'       : 'IF',
+    'else'     : 'ELSE',
+    'return'   : 'RETURN',
 }
 
 #Lista de tokens
 tokens = [
     'ID',
-    'CTE_ENT',
+    'CTE_INT',
     'CTE_FLOAT',
     'LETRERO',
 
@@ -79,7 +80,7 @@ def t_CTE_FLOAT(t):
     t.value = float(t.value)
     return t
 
-def t_CTE_ENT(t):
+def t_CTE_INT(t):
     r'-?\d+'
     t.value = int(t.value)
     return t

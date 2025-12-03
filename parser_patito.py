@@ -8,11 +8,11 @@ from quads import QuadManager
 
 lexer = build_lexer()
 
-precedence = (
-    ('left', 'GREATERTHAN', 'LESSTHAN', 'EQUAL', 'NOTEQ'),
-    ('left', 'PLUS', 'MINUS'),
-    ('left', 'MULT', 'DIVIDE'),
-)
+# precedence = (
+#     ('left', 'GREATERTHAN', 'LESSTHAN', 'EQUAL', 'NOTEQ'),
+#     ('left', 'PLUS', 'MINUS'),
+#     ('left', 'MULT', 'DIVIDE'),
+# )
 
 start = 'programa'
 
@@ -20,6 +20,8 @@ dir_funcs = FuncDirectory()
 
 current_function = None
 dir_funcs.add_function("global", "nula")
+current_func_call = None # FunctionInfo de la funcion que estoy llamando
+current_param_idx = 0 # Index de param actual
 
 quad_manager = QuadManager()
 
@@ -71,6 +73,11 @@ def relop_cuadruplo(op):
     left = quad_manager.pila_operandos.pop()
     left_type = quad_manager.pila_tipos.pop()
 
+    print("\nDEBUG relop:")
+    print(" left:", left, left_type)
+    print(" right:", right, right_type)
+
+
     result_type = check_types(op, left_type, right_type)
     temporal_address = quad_manager.new_temporal(result_type)
     quad_manager.add_cuadruplo(op, left, right, temporal_address)
@@ -80,7 +87,7 @@ def relop_cuadruplo(op):
 
     return ('temp', temporal_address, result_type)
 
-def unminus_cuadruplo(op):
+def unminus_cuadruplo():
     # Cuadruplos para operación unaria (-)
     operand = quad_manager.pila_operandos.pop()
     operand_type = quad_manager.pila_tipos.pop()
@@ -95,9 +102,30 @@ def unminus_cuadruplo(op):
 
 
 # ----- 1. Programa -----
+def p_programa_start(p):
+    '''program_start : PROGRAMA'''
+    global quad_manager, dir_funcs
+    if dir_funcs.get_funcs('global') is None:
+        dir_funcs.add_function('global', 'nula')
+
+    p.parser.goto_main_idx = quad_manager.add_cuadruplo('GOTO', None, None, None)
+
+def p_main_start(p):
+    '''main_start : START'''
+    global dir_funcs, quad_manager
+    dir_funcs.get_funcs('global').start_quad = len(quad_manager.cuadruplos)
+    
 def p_programa(p):
-    '''programa : PROGRAMA ID SEMICOLON skipVars cycleFuncs INICIO CUERPO FIN'''
-    p[0] = ('programa', p[2], p[4], p[5], p[7])
+    '''programa : program_start ID SEMICOLON skipVars cycleFuncs main_start CUERPO END'''
+    global dir_funcs, quad_manager
+
+    main_start = dir_funcs.get_funcs('global').start_quad
+
+    quad_manager.fill_cuadruplos(p.parser.goto_main_idx, main_start)
+
+    quad_manager.add_cuadruplo('END', None, None, None)
+
+    p[0] = ('programa', p[2])
 
 def p_skipVars(p):
     '''skipVars :
@@ -158,8 +186,8 @@ def p_ASIGNA(p):
 
 # ----- 4. CTE -----
 def p_CTE_ent(p):
-    '''CTE : CTE_ENT'''
-    p[0] = ("cte_ent", p[1])
+    '''CTE : CTE_INT'''
+    p[0] = ("cte_int", p[1])
 
 def p_CTE_float(p):
     '''CTE : CTE_FLOAT'''
@@ -167,12 +195,12 @@ def p_CTE_float(p):
 
 # ----- 10. TIPO -----
 def p_TIPO(p):
-    '''TIPO : ENTERO
-            | FLOTANTE'''
-    if p.slice[1].type == 'ENTERO':
-        p[0] = ('entero',)
+    '''TIPO : INT
+            | FLOAT'''
+    if p.slice[1].type == 'INT':
+        p[0] = ('int',)
     else:
-        p[0] = ('flotante',)
+        p[0] = ('float',)
 
 # ----- 5. Funciones -----
 def p_funcsHeader(p):
@@ -195,17 +223,28 @@ def p_funcsHeader(p):
 
 
 def p_FUNCS(p):
-    '''FUNCS : funcsHeader LEFTBRACE skipVars CUERPO RIGHTBRACE SEMICOLON'''
+    '''FUNCS : funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON'''
     global current_function
 
     type_null, func_name, params = p[1]
     local_vars = p[3]
-    cuerpo = p[4]
+    cuerpo = p[5]
 
     current_function = None
 
     p[0] = ('FUNCS', type_null, func_name, params, local_vars, cuerpo)
 
+def p_func_start(p):
+    '''func_start :'''
+    func_name = current_function
+    func_info = dir_funcs.get_funcs(func_name)
+    func_info.start_quad = len(quad_manager.cuadruplos)
+
+    vm.reset_temporals()
+
+def p_func_end(p):
+    '''func_end :'''
+    quad_manager.add_cuadruplo('ENDFUNC', None, None, None)
 
 def p_typeNull(p):
     '''typeNull : NULA
@@ -252,6 +291,27 @@ def p_ESTATUTO_imprime(p):
 def p_ESTATUTO_est(p):
     '''ESTATUTO : LEFTBRACKET ESTATUTO RIGHTBRACKET'''
     p[0] = ('ESTBRACKET', p[2])
+
+def p_ESTATUTO_return(p):
+    '''ESTATUTO : RETURN EXPRESION SEMICOLON'''
+    global current_function
+
+    if current_function is None:
+        raise SemanticError("Return not in function")
+    
+    func_info = dir_funcs.get_funcs(current_function)
+    func_ret_type = func_info.return_type
+
+    if func_ret_type is None or func_ret_type == 'nula':
+        raise SemanticError(f"Function '{current_function}' is void")
+    
+    _, expr_address, expr_type = p[2]
+    check_types('=', func_ret_type, expr_type)
+
+    if func_info.return_address is None:
+        raise SemanticError(f"No return address assigned")
+
+    quad_manager.add_cuadruplo('RETURN', None, None, expr_address)
 
 # ----- 7. EXPRESION -----
 def p_EXPRESION(p):
@@ -342,7 +402,7 @@ def p_skipID(p):
         p[0] = ("id", address, var_type)
     else:
         kind, value = p[1]
-        const_type = 'entero' if kind == 'cte_ent' else 'flotante'
+        const_type = 'int' if kind == 'cte_int' else 'float'
         const_address = vm.get_constant(value, const_type)
 
         quad_manager.pila_operandos.push(const_address)
@@ -353,22 +413,59 @@ def p_skipID(p):
 
 # ----- 12. LLAMADA -----
 def p_LLAMADA(p):
-    '''LLAMADA : ID LEFTPAREN args RIGHTPAREN'''
-    func = dir_funcs.get_funcs(p[1])
-    if not func:
-        raise SemanticError(f"Function '{p[1]}' not declared")
-    if len(p[3]) != len(func.param_types):
-        raise SemanticError(f"Function '{p[1]}' expects {len(func.param_types)} arguments, got {len(p[3])}")
-    
-    for (arg, expected_type) in zip(p[3], func.param_types):
-        arg_type = arg[-1]
-        check_types('=', expected_type, arg_type)
+    '''LLAMADA : ID ERA LEFTPAREN args RIGHTPAREN'''
+    global current_func_call, current_param_idx
+
+    func_name = p[1]
+    func = current_func_call
+    if func is None:
+        func = dir_funcs.get_funcs(func_name)
+        if not func:
+            raise SemanticError("Function '{func_name}' not declared")
         
-    p[0] = ('LLAMADA', p[1], p[3], func.return_type)
+    if current_param_idx != len(func.param_types):
+        raise SemanticError(f"Function '{func_name}' expects {len(func.param_types)} arguments, got {current_param_idx}")
+    
+    quad_manager.add_cuadruplo('GOSUB', None, None, func_name)
+
+    # parche gualadupano! si la funcion tiene return la guardamos en un temporal
+    if func.return_type is not None and func.return_type != 'nula':
+        if func.return_address is None:
+            raise SemanticError(f"Function '{func_name}' has no return_address")
+        
+        temp_address = quad_manager.new_temporal(func.return_type)
+        quad_manager.add_cuadruplo('=', func.name, None, temp_address)
+
+        quad_manager.pila_operandos.push(temp_address)
+        quad_manager.pila_tipos.push(func.return_type)
+
+        result = ('temp', temp_address, func.return_type)
+    else:
+        result = ('call', func_name, None, 'nula')
+
+
+    # Reset estados de llamada
+    current_func_call = None
+    current_param_idx = 0
+
+    p[0] = result
+
+def p_ERA(p):
+    '''ERA :'''
+    global current_func_call, current_param_idx
+    func_name = p[-1]
+    func = dir_funcs.get_funcs(func_name)
+    if not func:
+        raise SemanticError(f"Function '{func_name}' not declared")
+    
+    current_func_call = func
+    current_param_idx = 0
+
+    quad_manager.add_cuadruplo('ERA', None, None, func_name)
 
 def p_args(p):
     '''args :
-            | EXPRESION argsCycle'''
+            | arg_item argsCycle'''
     if len(p) == 1:
         p[0] = []
     else:
@@ -376,11 +473,37 @@ def p_args(p):
 
 def p_argsCycle(p):
     '''argsCycle :
-                 | COMMA EXPRESION argsCycle '''
+                 | COMMA arg_item argsCycle '''
     if len(p) == 1:
         p[0] = []
     else:
         p[0] = [p[2]] + p[3]
+
+def p_arg_item(p):
+    '''arg_item : EXPRESION'''
+    global current_param_idx, current_func_call
+
+    expr = p[1]
+    if current_func_call is None:
+        raise SemanticError("Out of context argument in function call")
+    
+    _, arg_address, arg_type = expr
+
+    if current_param_idx >= len(current_func_call.param_types):
+        raise SemanticError("Too many arguments for function '{current_func_call.name}'")
+    
+    expected_type = current_func_call.param_types[current_param_idx]
+    check_types('=', expected_type, arg_type)
+
+    param_count = f"P{current_param_idx + 1}"
+    quad_manager.add_cuadruplo('PARAM', arg_address, None, param_count)
+
+    quad_manager.pila_operandos.pop()
+    quad_manager.pila_tipos.pop()
+
+    current_param_idx += 1
+
+    p[0] = expr
 
 # ----- 13. VARS -----
 def p_VARS_sect(p):
@@ -411,7 +534,7 @@ def p_cycleP_VARS(p):
 
 # ----- 14. IMPRIME -----
 def p_IMPRIME(p):
-    '''IMPRIME : ESCRIBE LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON'''
+    '''IMPRIME : PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON'''
     items = [p[3]] + p[4]
 
     for item in items:
@@ -439,8 +562,8 @@ def p_cycleImp(p):
 
 # ----- 15. CICLO -----
 def p_CICLO(p):
-    '''CICLO : MIENTRAS ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF HAZ CUERPO ciclo_end SEMICOLON'''
-    p[0] = ("mientras", p[4], p[8])
+    '''CICLO : WHILE ciclo_start LEFTPAREN EXPRESION RIGHTPAREN ciclo_goToF DO CUERPO ciclo_end SEMICOLON'''
+    p[0] = ("while", p[4], p[8])
 
 def p_ciclo_start(p):
     '''ciclo_start :'''
@@ -453,7 +576,7 @@ def p_ciclo_goToF(p):
     cond_type = quad_manager.pila_tipos.pop()
 
     if cond_type != 'bool':
-        raise SemanticError("Condicion mientras debe ser tipo bool")
+        raise SemanticError("Condicion 'while' debe ser tipo bool")
     
     goToF_idx = quad_manager.add_cuadruplo('GOTOF', cond_address, None, None)
     quad_manager.pila_saltos.push(goToF_idx)
@@ -470,12 +593,12 @@ def p_ciclo_end(p):
 
 # ----- 16. CONDICION -----
 def p_CONDICION_if(p):
-    '''CONDICION : SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON'''
-    p[0] = ('si', p[3], p[6], None)
+    '''CONDICION : IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON'''
+    p[0] = ('if', p[3], p[6], None)
 
 def p_CONDICION_ifelse(p):
-    '''CONDICION : SI LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO SINO if_else CUERPO if_else_end SEMICOLON'''
-    p[0] = ('si', p[3], p[6], p[9])
+    '''CONDICION : IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON'''
+    p[0] = ('if', p[3], p[6], p[9])
 
 def p_if_goToF(p):
     '''if_goToF :'''
@@ -483,7 +606,7 @@ def p_if_goToF(p):
     cond_type = quad_manager.pila_tipos.pop()
 
     if cond_type != 'bool':
-        raise SemanticError("Condicion si debe ser tipo bool")
+        raise SemanticError("Condicion 'if' debe ser tipo bool")
     
     goToF_idx = quad_manager.add_cuadruplo('GOTOF', cond_address, None, None)
     quad_manager.pila_saltos.push(goToF_idx)
@@ -519,19 +642,40 @@ parser = yacc.yacc()
 
 if __name__ == "__main__":
     data = """
-    programa p;
+    programa x;
     vars
-        x : entero;
-    inicio {
-        si (x > 0) {
-            escribe("positivo");
-        } sino {
-            escribe("no positivo");
-        };
+        i : int;
+        j : int;
+
+    nula uno(a:int) {
+        {
+            i = a * 2;
+            if (i < a + 4) {
+                uno(a + 1);
+            };
+            print(i);
+        }
+    };
+
+    int dos(b:int) {
+        {
+            b = b * i + j;
+            return (b * 2);
+        }
+    };
+
+    start {
+        i = 2;
+        j = i * 2 - 1;
+        uno(j);
+        print(i + dos(i + j));
     }
+    end
 
 
     """
+
+
     result = parser.parse(data, lexer=lexer)
     print("AST:")
     print(result)
@@ -541,4 +685,6 @@ if __name__ == "__main__":
     print("\nCuádruplos con direcciones:")
     quad_manager.print_cuadruplos()
 
-    
+    print("\nCuádruplos:")
+    quad_manager.print_cuadruplos_symbolic(dir_funcs, vm)
+
