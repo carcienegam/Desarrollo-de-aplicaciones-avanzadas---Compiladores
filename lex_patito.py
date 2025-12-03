@@ -47,8 +47,10 @@ tokens = [
     'RIGHTBRACKET',
 ] + list(reserved.values())
 
+
 # Reglas de expresiones regulares para tokens simples
 
+# Operadores
 t_PLUS = r'\+'
 t_MINUS = r'-'
 t_MULT = r'\*'
@@ -59,6 +61,7 @@ t_EQUAL = r'=='
 t_NOTEQ = r'!='
 t_ASSIGN = r'='
 
+# Simbolos
 t_SEMICOLON = r';'
 t_COMMA = r','
 t_COLON = r':'
@@ -69,6 +72,7 @@ t_RIGHTPAREN = r'\)'
 t_LEFTBRACKET = r'\['
 t_RIGHTBRACKET = r'\]'
 
+# Ignorar espacios y tabs
 t_ignore = ' \t'
 
 def t_COMMENT(t):
@@ -92,10 +96,10 @@ def t_LETRERO(t): #strings
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
-    t.type = reserved.get(t.value, 'ID') 
+    t.type = reserved.get(t.value, 'ID') # Si es palabra reservada uso el token reservado
     return t
 
-def t_newline(t):
+def t_newline(t): # saltos de linea
     r'\n+'
     t.lexer.lineno += len(t.value)
 

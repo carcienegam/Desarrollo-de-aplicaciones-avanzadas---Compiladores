@@ -112,9 +112,12 @@ def p_programa_start(p):
 
 def p_main_start(p):
     '''main_start : START'''
-    global dir_funcs, quad_manager
+    global dir_funcs, vm, quad_manager
+    vm.reset_temporals()
+
     dir_funcs.get_funcs('global').start_quad = len(quad_manager.cuadruplos)
-    
+
+
 def p_programa(p):
     '''programa : program_start ID SEMICOLON skipVars cycleFuncs main_start CUERPO END'''
     global dir_funcs, quad_manager
@@ -236,11 +239,13 @@ def p_FUNCS(p):
 
 def p_func_start(p):
     '''func_start :'''
-    func_name = current_function
-    func_info = dir_funcs.get_funcs(func_name)
-    func_info.start_quad = len(quad_manager.cuadruplos)
+    global current_function, vm
 
+    # Reset temporales
     vm.reset_temporals()
+
+    func_info = dir_funcs.get_funcs(current_function)
+    func_info.start_quad = len(quad_manager.cuadruplos)
 
 def p_func_end(p):
     '''func_end :'''

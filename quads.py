@@ -57,6 +57,7 @@ class QuadManager():
         self.count_temporales += 1
         address = vm.allocate_temporal(tipo)
         return address
+    
         
     def add_cuadruplo(self, op, left_op=None, right_op=None, result=None):
         cuadruplo = Quadruple(op, left_op, right_op, result)
@@ -136,7 +137,7 @@ class QuadManager():
         print("------------------------------------------")
 
 
-        
+
     def __repr__(self):
         return (f"QuadManager(\n"
                 f"  {self.pila_operandos}\n"

@@ -14,8 +14,10 @@ class VirtualMemory:
         }
 
         self.counters = {
-            segment: {t: memory for t, memory in tipos.items()}
-            for segment, tipos in self.memory.items()
+            'global':   {'int': 0, 'float': 0, 'bool': 0},
+            'local':    {'int': 0, 'float': 0, 'bool': 0},
+            'temporal': {'int': 0, 'float': 0, 'bool': 0},
+            'const':    {'int': 0, 'float': 0, 'letrero': 0},
         }
 
         self.const_tables = {
@@ -29,19 +31,22 @@ class VirtualMemory:
         
     def allocate_variable(self, scope_level, var_type) -> int:
         segment = self.scope_segment(scope_level)
-        if var_type not in self.counters[segment]:
+        if var_type not in self.memory[segment]:
             raise ValueError(f"Type '{var_type}' not supported in segment '{segment}'")
-        address = self.counters[segment][var_type]
+
+        base = self.memory[segment][var_type]
+        offset = self.counters[segment][var_type]
+        address = base + offset
         self.counters[segment][var_type] += 1
         return address
         
-    def allocate_temporal(self, temp_type) -> int:
-        segment = 'temporal'
-        if temp_type not in self.counters[segment]:
-            raise ValueError(f"Type '{temp_type}' not supported in segment '{segment}'")
-        address = self.counters[segment][temp_type]
-        self.counters[segment][temp_type] += 1
+    def allocate_temporal(self, tipo) -> int:
+        base = self.memory['temporal'][tipo]
+        offset = self.counters['temporal'][tipo]
+        address = base + offset
+        self.counters['temporal'][tipo] += 1
         return address
+
         
     def get_constant(self, value, const_type) -> int:
         if const_type not in self.const_tables:
@@ -51,14 +56,17 @@ class VirtualMemory:
         if value in table:
             return table[value]
             
-        segment = 'const'
-        address = self.counters[segment][const_type]
-        self.counters[segment][const_type] += 1
+        base = self.memory['const'][const_type]
+        offset = self.counters['const'][const_type]
+        address = base + offset
+        self.counters['const'][const_type] += 1
+        
         table[value] = address
         return address
     
     def reset_temporals(self):
-        self.counters['temporal'] = {tipo: 0 for tipo in self.counters['temporal']}
+        for tipo in self.counters['temporal']:
+            self.counters['temporal'][tipo] = 0
         
 vm = VirtualMemory()
 
