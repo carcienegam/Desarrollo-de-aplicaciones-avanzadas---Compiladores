@@ -1,5 +1,6 @@
 import ply.yacc as yacc
 from lex_patito import tokens, build_lexer
+from virtual_machine import VirtualMachine
 
 from semantics import FuncDirectory, SemanticError, tipo_to_str, function_directory, vm
 from semantic_cube import check_types
@@ -101,14 +102,15 @@ def p_programa_start(p):
     if dir_funcs.get_funcs('global') is None:
         dir_funcs.add_function('global', 'nula')
 
-    # Genera un cuadruplo temporal GOTO para el GOTO main de despues
+    # Punto neuralgico 1: Genera un cuadruplo temporal GOTO para el GOTO main de despues
     p.parser.goto_main_idx = quad_manager.add_cuadruplo('GOTO', None, None, None)
 
 def p_main_start(p):
     '''main_start : MAIN''' #starts cuando ve el 'main'
     global dir_funcs, vm, quad_manager
-    vm.reset_temporals() # reset temporales 
+    vm.reset_temporals() # reset temporales
 
+    # Punto neuralgico 2: marca inicio del main
     dir_funcs.get_funcs('global').start_quad = len(quad_manager.cuadruplos) # index primer cuadruplo del main
 
 
@@ -117,17 +119,17 @@ def p_programa(p):
     global dir_funcs, quad_manager
 
     main_start = dir_funcs.get_funcs('global').start_quad # cuadruplo de main
-    quad_manager.fill_cuadruplos(p.parser.goto_main_idx, main_start) # rellena cuadruplo main c/dirrecion
+    # Punto neuralgico 4: rellena el cuadruplo de GOTO inicial del main con la direccion
+    quad_manager.fill_cuadruplos(p.parser.goto_main_idx, main_start)
 
+    # Punto neuralgico 5: genera el END del programa
     quad_manager.add_cuadruplo('END', None, None, None)
-
-    p[0] = ('programa', p[2])
 
 def p_skipVars(p):
     '''skipVars :
                   | VARS_sect '''
     if len(p) == 1:
-        p[0] = None
+        pass
     else:
         vars_ast = p[1]
         tag, decls = vars_ast
@@ -138,56 +140,52 @@ def p_skipVars(p):
         else:
             func_info = dir_funcs.get_funcs("global") # Globales
 
+        # Punto neuralgico 3: inserta variable en la tabla con direccion virtual
         # Recorre y mete en la variable table adecuada
         for (_, name, tipo) in decls:
             var_type = tipo_to_str(tipo)
             func_info.var_table.add_variable(name, var_type, kind='var')
 
-        p[0] = vars_ast
-
 def p_cycleFuncs(p):
     '''cycleFuncs :
                    | FUNCS cycleFuncs '''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = [p[1]] + p[2]
+    pass
 
 # ----- 2. Cuerpo -----
 def p_CUERPO(p):
     '''CUERPO : LEFTBRACE cycleEst RIGHTBRACE'''
-    p[0] = ('CUERPO', p[2])
+    pass
 
 def p_cycleEst(p):
     '''cycleEst :
                  | ESTATUTO cycleEst '''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = [p[1]] + p[2]
+    pass
 
 # ----- 3. Asigna ------
 def p_ASIGNA(p):
     '''ASIGNA : ID ASSIGN EXPRESION SEMICOLON'''
-    left_info = get_var_info(p[1])
-    left_type = get_var_type(p[1])
-    left_address = left_info.address
 
-    right_type = p[3][-1]
-    check_types('=', left_type, right_type)
+    # Revisa variables izquierdas
+    left_info = get_var_info(p[1]) #info 
+    left_type = get_var_type(p[1]) # tipo
+    left_address = left_info.address # direccion
+
+    right_type = p[3][-1] # tipo de la derecha EXPRESION = (temp/cte/id, address, tipo)
+    check_types('=', left_type, right_type) # verify match tipos
 
     _, right_address, _ = p[3]
 
+    # Punto neuralgico 6: genera cuadruplo de asignacion
     quad_manager.add_cuadruplo('=', right_address, None, left_address)
-
-    p[0] = ('ASIGNA', left_address, p[3], left_type)
 
 # ----- 4. CTE -----
 def p_CTE_ent(p):
+    # Constante entera
     '''CTE : CTE_INT'''
     p[0] = ("cte_int", p[1])
 
 def p_CTE_float(p):
+    # Constante flotante
     '''CTE : CTE_FLOAT'''
     p[0] = ("cte_float", p[1])
 
@@ -202,48 +200,45 @@ def p_TIPO(p):
 
 # ----- 5. Funciones -----
 def p_funcsHeader(p):
+    # Primera parte de FUNCS
     '''funcsHeader : typeNull ID LEFTPAREN p_Follow RIGHTPAREN'''
 
     global current_function
     return_type = tipo_to_str(p[1])
     func_name = p[2]
 
-    current_function = func_name
+    current_function = func_name # entramos a scope
 
+    # Punto neuralgico 7: registramos nueva funcion en el direcorio
     func_info = dir_funcs.add_function(func_name, return_type)
 
+    # Registramos parametros en tabla de variables de la funcion
     params = p[4]
     for param_name, tipo in params:
         param_type = tipo_to_str(tipo)
         func_info.add_parameter(param_name, param_type)
 
-    p[0] = (p[1], func_name, params)
-
-
 def p_FUNCS(p):
+    # Definicion completa de la funcion
     '''FUNCS : funcsHeader LEFTBRACE skipVars func_start CUERPO func_end RIGHTBRACE SEMICOLON'''
     global current_function
-
-    type_null, func_name, params = p[1]
-    local_vars = p[3]
-    cuerpo = p[5]
-
-    current_function = None
-
-    p[0] = ('FUNCS', type_null, func_name, params, local_vars, cuerpo)
+    current_function = None # ENDFUNC salimos del scope y regresamos a global
 
 def p_func_start(p):
     '''func_start :'''
     global current_function, vm
 
+    # Punto neuralgico 8: marca el inicio de los cuadruplos de la funcion y reinicio de temporales
     # Reset temporales
     vm.reset_temporals()
 
+    # Guardar cuadruplos de inicio funcion
     func_info = dir_funcs.get_funcs(current_function)
     func_info.start_quad = len(quad_manager.cuadruplos)
 
 def p_func_end(p):
     '''func_end :'''
+    # Punto neuralgico 9: genera cuadruplo de ENDFUNC
     quad_manager.add_cuadruplo('ENDFUNC', None, None, None)
 
 def p_typeNull(p):
@@ -268,55 +263,45 @@ def p_commaCycleFuncs(p):
         p[0] = p[2]
 
 # ----- 6. ESTATUTO -----
-def p_ESTATUTO_asigna(p):
-    '''ESTATUTO : ASIGNA'''
-    p[0] = p[1]
-
-def p_ESTATUTO_condicional(p):
-    '''ESTATUTO : CONDICION'''
-    p[0] = p[1]
-
-def p_ESTATUTO_ciclo(p):
-    '''ESTATUTO : CICLO'''
-    p[0] = p[1]
-
-def p_ESTATUTO_llamada(p):
-    '''ESTATUTO : LLAMADA SEMICOLON'''
-    p[0] = ('ESTLLAMADA', p[1])
-
-def p_ESTATUTO_imprime(p):
-    '''ESTATUTO : IMPRIME'''
-    p[0] = p[1]
-
-def p_ESTATUTO_est(p):
-    '''ESTATUTO : LEFTBRACKET ESTATUTO RIGHTBRACKET'''
-    p[0] = ('ESTBRACKET', p[2])
+def p_ESTATUTO(p):
+    '''ESTATUTO : ASIGNA
+                | CONDICION
+                | CICLO
+                | LLAMADA SEMICOLON
+                | IMPRIME
+                | LEFTBRACKET ESTATUTO RIGHTBRACKET'''
+    pass
 
 def p_ESTATUTO_return(p):
     '''ESTATUTO : RETURN EXPRESION SEMICOLON'''
     global current_function
 
+    # Verificar que return este dentro de funcion
     if current_function is None:
         raise SemanticError("Return not in function")
     
+    # Info duncion actual
     func_info = dir_funcs.get_funcs(current_function)
     func_ret_type = func_info.return_type
 
+    # Evitar retornos en funciones nulas
     if func_ret_type is None or func_ret_type == 'nula':
         raise SemanticError(f"Function '{current_function}' is void")
     
+    # Validar que tipos match
     _, expr_address, expr_type = p[2]
     check_types('=', func_ret_type, expr_type)
 
+    # Validar return address en funcion
     if func_info.return_address is None:
         raise SemanticError(f"No return address assigned")
 
-    quad_manager.add_cuadruplo('RETURN', None, None, expr_address)
+    quad_manager.add_cuadruplo('RETURN', None, None, expr_address) # Cuadruplo return
 
 # ----- 7. EXPRESION -----
 def p_EXPRESION(p):
     '''EXPRESION : EXP signsExp'''
-    if p[2] is None:
+    if p[2] is None: # Si no hay operador nos vamos a EXP
         p[0] = p[1]
     else:
         p[0] = p[2]
@@ -328,7 +313,7 @@ def p_signsExp(p):
                  | EQUAL EXP
                  | NOTEQ EXP'''
     if len(p) == 1:
-        p[0] = None
+        p[0] = None # No hay operador relacional
     else:
         if p.slice[1].type == 'GREATERTHAN':
             op = '>'
@@ -339,16 +324,17 @@ def p_signsExp(p):
         else:
             op = '=='
 
-        expr = relop_cuadruplo(op)
-        p[0] = expr
+        # Punto neuralgico 10: genera cuadruplos relacionales (<, >, ==, !=)
+        p[0] = relop_cuadruplo(op)
 
 # ----- 8. EXP -----
 def p_EXP_sign(p):
     '''EXP : EXP PLUS TERMINO
            | EXP MINUS TERMINO'''
     op = '+' if p[2] == '+' else '-'
-    expr = binop_cuadruplo(op)
-    p[0] = expr
+
+    # Punto neuralgico 11: genera cuadruplo + o -
+    p[0] = binop_cuadruplo(op)
 
 def p_EXP_term(p):
     '''EXP : TERMINO'''
@@ -359,8 +345,9 @@ def p_TERMINO_sign(p):
     '''TERMINO : TERMINO MULT FACTOR
                | TERMINO DIVIDE FACTOR'''
     op = '*' if p[2] == '*' else '/'
-    expr = binop_cuadruplo(op)
-    p[0] = expr
+
+    # Punto neuralgico 12: genera cuadruplo * o /
+    p[0] = binop_cuadruplo(op)
 
 def p_TERMINO_factor(p):
     '''TERMINO : FACTOR'''
@@ -381,6 +368,7 @@ def p_FACTOR_plus(p):
 
 def p_FACTOR_minus(p):
     '''FACTOR : MINUS skipID'''
+    # Punto neuralgico 15: genera cuadruplos para variables negativas
     expr = unminus_cuadruplo()
     p[0] = expr
 
@@ -396,6 +384,7 @@ def p_skipID(p):
         var_type = get_var_type(p[1])
         address = var_info.address
 
+        # Punto neuralgico 13: carga ID a pila de operandos con su direccion
         quad_manager.pila_operandos.push(address)
         quad_manager.pila_tipos.push(var_type)
 
@@ -403,6 +392,8 @@ def p_skipID(p):
     else:
         kind, value = p[1]
         const_type = 'int' if kind == 'cte_int' else 'float'
+
+        # Punto neuralgico 14: registra constantes en la tabla de direccion virtual
         const_address = vm.get_constant(value, const_type)
 
         quad_manager.pila_operandos.push(const_address)
@@ -416,6 +407,7 @@ def p_LLAMADA(p):
     '''LLAMADA : ID ERA LEFTPAREN args RIGHTPAREN'''
     global current_func_call, current_param_idx
 
+    # Identificar la funcion
     func_name = p[1]
     func = current_func_call
     if func is None:
@@ -423,18 +415,21 @@ def p_LLAMADA(p):
         if not func:
             raise SemanticError("Function '{func_name}' not declared")
         
+    # Validar # de args
     if current_param_idx != len(func.param_types):
         raise SemanticError(f"Function '{func_name}' expects {len(func.param_types)} arguments, got {current_param_idx}")
     
-    quad_manager.add_cuadruplo('GOSUB', None, None, func_name)
+    # Punto neuralgico 18: genera cuadruplo GOSUB cuando se termina la funcion
+    quad_manager.add_cuadruplo('GOSUB', None, None, func_name) # cuadruplo gosub
 
     # parche gualadupano! si la funcion tiene return la guardamos en un temporal
     if func.return_type is not None and func.return_type != 'nula':
         if func.return_address is None:
             raise SemanticError(f"Function '{func_name}' has no return_address")
         
-        temp_address = quad_manager.new_temporal(func.return_type)
-        quad_manager.add_cuadruplo('=', func.name, None, temp_address)
+        # Punto neuralgico 19: genera cuadruplo con temporal con el valor de retorno de la funcion
+        temp_address = quad_manager.new_temporal(func.return_type) # temporal de valor de retorno
+        quad_manager.add_cuadruplo('=', func.name, None, temp_address) # asignar el return a temp
 
         quad_manager.pila_operandos.push(temp_address)
         quad_manager.pila_tipos.push(func.return_type)
@@ -458,14 +453,17 @@ def p_ERA(p):
     if not func:
         raise SemanticError(f"Function '{func_name}' not declared")
     
+    # Reset conteo de params
     current_func_call = func
     current_param_idx = 0
 
+    # Punto neuralgico 16: se prepara para activar la funcion, crea cuadruplo ERA
     quad_manager.add_cuadruplo('ERA', None, None, func_name)
 
 def p_args(p):
     '''args :
             | arg_item argsCycle'''
+    # Lista de argumentos
     if len(p) == 1:
         p[0] = []
     else:
@@ -481,6 +479,7 @@ def p_argsCycle(p):
 
 def p_arg_item(p):
     '''arg_item : EXPRESION'''
+    # Procesamiento de argumento individual
     global current_param_idx, current_func_call
 
     expr = p[1]
@@ -489,15 +488,19 @@ def p_arg_item(p):
     
     _, arg_address, arg_type = expr
 
+    # Revisar limite de parametros
     if current_param_idx >= len(current_func_call.param_types):
         raise SemanticError("Too many arguments for function '{current_func_call.name}'")
     
+    # Validar tipos
     expected_type = current_func_call.param_types[current_param_idx]
     check_types('=', expected_type, arg_type)
 
+    # Punto neuralgico 17: genera cuadruplo PARAM
     param_count = f"P{current_param_idx + 1}"
     quad_manager.add_cuadruplo('PARAM', arg_address, None, param_count)
 
+    # Sacamos operando porque ya no se usa
     quad_manager.pila_operandos.pop()
     quad_manager.pila_tipos.pop()
 
@@ -535,26 +538,28 @@ def p_cycleP_VARS(p):
 # ----- 14. IMPRIME -----
 def p_IMPRIME(p):
     '''IMPRIME : PRINT LEFTPAREN imp cycleImp RIGHTPAREN SEMICOLON'''
-    items = [p[3]] + p[4]
+    items = [p[3]] + p[4] # lista completa de elementos a imprimir
 
     for item in items:
-        address = item[1]
-        quad_manager.add_cuadruplo('IMPRIME', address, None, None)
+        address = item[1] #direccion virtual del valor a imprimir
 
-    p[0] = ('IMPRIME', items)
+        # Punto neuralgico 20: genera cuadruplo para imprimir por cada segmento
+        quad_manager.add_cuadruplo('IMPRIME', None, None, address)
 
 def p_imp(p):
     '''imp : LETRERO
            | EXPRESION'''
     if p.slice[1].type == 'LETRERO':
+        # Checar si existe const en vm, si no crea y asigna direccion
         address = vm.get_constant(p[1], 'letrero')
         p[0] = ("letrero", address, 'letrero')
     else:
-        p[0] = p[1]
+        p[0] = p[1] # tupla de EXPRESION ("temp"/"cte"/"id", address, tipo)
 
 def p_cycleImp(p):
     '''cycleImp :
                  | COMMA imp cycleImp '''
+    # Mas de 1 cosa por imprimir, lista separada por comas
     if len(p) == 1:
         p[0] = []
     else:
@@ -568,6 +573,8 @@ def p_CICLO(p):
 def p_ciclo_start(p):
     '''ciclo_start :'''
     start_idx =  len(quad_manager.cuadruplos)
+
+    # Punto neuralgico 21: marca inicio del ciclo
     quad_manager.pila_saltos.push(start_idx)
 
 def p_ciclo_goToF(p):
@@ -578,6 +585,7 @@ def p_ciclo_goToF(p):
     if cond_type != 'bool':
         raise SemanticError("Condicion 'while' debe ser tipo bool")
     
+    # Punto neuralgico 22: genera cuadruplo de gotoF para la condicion del while
     goToF_idx = quad_manager.add_cuadruplo('GOTOF', cond_address, None, None)
     quad_manager.pila_saltos.push(goToF_idx)
 
@@ -585,20 +593,23 @@ def p_ciclo_end(p):
     '''ciclo_end :'''
     goToF_idx = quad_manager.pila_saltos.pop()
     start_idx = quad_manager.pila_saltos.pop()
+
+    # Punto neuralgico 23: genera el cuadruplo goTo que salta al inicio del while
     quad_manager.add_cuadruplo('GOTO', None, None, start_idx)
 
     exit_idx = len(quad_manager.cuadruplos)
+    # Punto neuralgico 24: rellena el gotoF con la direccion de salida del while
     quad_manager.fill_cuadruplos(goToF_idx, exit_idx)
 
 
 # ----- 16. CONDICION -----
 def p_CONDICION_if(p):
     '''CONDICION : IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO if_noElse SEMICOLON'''
-    p[0] = ('if', p[3], p[6], None)
+    pass
 
 def p_CONDICION_ifelse(p):
     '''CONDICION : IF LEFTPAREN EXPRESION RIGHTPAREN if_goToF CUERPO ELSE if_else CUERPO if_else_end SEMICOLON'''
-    p[0] = ('if', p[3], p[6], p[9])
+    pass
 
 def p_if_goToF(p):
     '''if_goToF :'''
@@ -608,6 +619,7 @@ def p_if_goToF(p):
     if cond_type != 'bool':
         raise SemanticError("Condicion 'if' debe ser tipo bool")
     
+    # Punto neuralgico 25: genera cuadruplo de gotoF para la condicion del if
     goToF_idx = quad_manager.add_cuadruplo('GOTOF', cond_address, None, None)
     quad_manager.pila_saltos.push(goToF_idx)
 
@@ -615,12 +627,16 @@ def p_if_noElse(p):
     '''if_noElse :'''
     goToF_idx = quad_manager.pila_saltos.pop()
     exit_idx = len(quad_manager.cuadruplos)
+
+    # Punto neuralgico 26: rellena el gotoF del if cuando no hay un else
     quad_manager.fill_cuadruplos(goToF_idx, exit_idx)
 
 def p_if_else(p):
     '''if_else :'''
+    # Punto neuralgico 27: genera cuadruplo goTo para saltar al inicio del bloqu del else
     goTo_idx = quad_manager.add_cuadruplo('GOTO', None, None, None)
     goToF_idx = quad_manager.pila_saltos.pop()
+    # Punto neuralgico 28: rellena el gotoF para despues poder entrar al else
     quad_manager.fill_cuadruplos(goToF_idx, len(quad_manager.cuadruplos))
 
     quad_manager.pila_saltos.push(goTo_idx)
@@ -629,6 +645,7 @@ def p_if_else_end(p):
     '''if_else_end :'''
     goTo_idx = quad_manager.pila_saltos.pop()
     exit_idx = len(quad_manager.cuadruplos)
+    # Punto neuralgico 29: rellena el goTo final del if/else
     quad_manager.fill_cuadruplos(goTo_idx, exit_idx)
 
 # ----- ERROR -----
@@ -642,6 +659,7 @@ parser = yacc.yacc()
 
 if __name__ == "__main__":
     data = """
+
     programa x;
     vars
         i : int;
@@ -672,19 +690,23 @@ if __name__ == "__main__":
     }
     end
 
-
     """
 
-
     result = parser.parse(data, lexer=lexer)
-    print("AST:")
-    print(result)
-
-    function_directory(dir_funcs)
 
     print("\nCuádruplos con direcciones:")
     quad_manager.print_cuadruplos()
 
     print("\nCuádruplos:")
     quad_manager.print_cuadruplos_symbolic(dir_funcs, vm)
+
+    # constant_table = {}
+    # for tipo, table in vm.const_tables.items():
+    #     for value, address in table.items():
+    #         constant_table[address] = value
+
+    # print("\nSalida del programa:")
+    # vm_exec = VirtualMachine(quad_manager.cuadruplos, dir_funcs, constant_table)
+    # vm_exec.run()
+
 
