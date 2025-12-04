@@ -697,8 +697,8 @@ if __name__ == "__main__":
     print("\nCuádruplos con direcciones:")
     quad_manager.print_cuadruplos()
 
-    print("\nCuádruplos:")
-    quad_manager.print_cuadruplos_symbolic(dir_funcs, vm)
+    # print("\nCuádruplos:")
+    # quad_manager.print_cuadruplos_symbolic(dir_funcs, vm)
 
     # constant_table = {}
     # for tipo, table in vm.const_tables.items():

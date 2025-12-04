@@ -75,66 +75,66 @@ class QuadManager():
         for i, cuadruplo in enumerate(self.cuadruplos):
             print(f"{i}: {cuadruplo}")
 
-    def print_cuadruplos_symbolic(self, dir_funcs, vm):
-        """
-        Imprime los cuádruplos traduciendo direcciones virtuales a:
-        - nombres de variables (x, y, foo.a)
-        - literales de constantes (3, 1.5, "hola")
-        - temporales (t0, t1, ...)
-        Si el operando no es int, se imprime tal cual.
-        """
-        # 1) Direcciones de variables -> nombres
-        addr_to_name = {}
-        for func_name, func_info in dir_funcs.functions.items():
-            for var_name, var_info in func_info.var_table.table.items():
-                if func_name == "global":
-                    pretty_name = var_name
-                else:
-                    pretty_name = f"{func_name}.{var_name}"
-                addr_to_name[var_info.address] = pretty_name
+    # def print_cuadruplos_symbolic(self, dir_funcs, vm):
+    #     """
+    #     Imprime los cuádruplos traduciendo direcciones virtuales a:
+    #     - nombres de variables (x, y, foo.a)
+    #     - literales de constantes (3, 1.5, "hola")
+    #     - temporales (t0, t1, ...)
+    #     Si el operando no es int, se imprime tal cual.
+    #     """
+    #     # 1) Direcciones de variables -> nombres
+    #     addr_to_name = {}
+    #     for func_name, func_info in dir_funcs.functions.items():
+    #         for var_name, var_info in func_info.var_table.table.items():
+    #             if func_name == "global":
+    #                 pretty_name = var_name
+    #             else:
+    #                 pretty_name = f"{func_name}.{var_name}"
+    #             addr_to_name[var_info.address] = pretty_name
 
-        # 2) Direcciones de constantes -> literals
-        addr_to_const = {}
-        for tipo, table in vm.const_tables.items():
-            for value, addr in table.items():
-                if tipo == 'letrero':
-                    addr_to_const[addr] = repr(value)  # "texto"
-                else:
-                    addr_to_const[addr] = str(value)
+    #     # 2) Direcciones de constantes -> literals
+    #     addr_to_const = {}
+    #     for tipo, table in vm.const_tables.items():
+    #         for value, addr in table.items():
+    #             if tipo == 'letrero':
+    #                 addr_to_const[addr] = repr(value)  # "texto"
+    #             else:
+    #                 addr_to_const[addr] = str(value)
 
-        # 3) Temporales (lo que no es ni var ni const)
-        temp_map = {}
-        temp_count = 0
-        for q in self.cuadruplos:
-            for op in (q.left_op, q.right_op, q.result):
-                if isinstance(op, int) and op not in addr_to_name and op not in addr_to_const:
-                    if op not in temp_map:
-                        temp_map[op] = f"t{temp_count}"
-                        temp_count += 1
+    #     # 3) Temporales (lo que no es ni var ni const)
+    #     temp_map = {}
+    #     temp_count = 0
+    #     for q in self.cuadruplos:
+    #         for op in (q.left_op, q.right_op, q.result):
+    #             if isinstance(op, int) and op not in addr_to_name and op not in addr_to_const:
+    #                 if op not in temp_map:
+    #                     temp_map[op] = f"t{temp_count}"
+    #                     temp_count += 1
 
-        def fmt(op):
-            if op is None:
-                return "_"
-            if not isinstance(op, int):
-                return str(op)
-            if op in addr_to_name:
-                return addr_to_name[op]
-            if op in addr_to_const:
-                return addr_to_const[op]
-            if op in temp_map:
-                return temp_map[op]
-            return f"@{op}"  # fallback: dirección cruda
+    #     def fmt(op):
+    #         if op is None:
+    #             return "_"
+    #         if not isinstance(op, int):
+    #             return str(op)
+    #         if op in addr_to_name:
+    #             return addr_to_name[op]
+    #         if op in addr_to_const:
+    #             return addr_to_const[op]
+    #         if op in temp_map:
+    #             return temp_map[op]
+    #         return f"@{op}"  # fallback: dirección cruda
 
-        print("----- Cuádruplos (formato simbólico) -----")
-        for i, q in enumerate(self.cuadruplos):
-            # Si es un salto: NO formatear result como dirección
-            if q.op in ["GOTO", "GOTOF", "GOTOT", "GOSUB"]:
-                res = q.result  # índice de cuádruplo, NO dirección virtual
-            else:
-                res = fmt(q.result)
+    #     print("----- Cuádruplos (formato simbólico) -----")
+    #     for i, q in enumerate(self.cuadruplos):
+    #         # Si es un salto: NO formatear result como dirección
+    #         if q.op in ["GOTO", "GOTOF", "GOTOT", "GOSUB"]:
+    #             res = q.result  # índice de cuádruplo, NO dirección virtual
+    #         else:
+    #             res = fmt(q.result)
 
-            print(f"{i}: ({q.op}, {fmt(q.left_op)}, {fmt(q.right_op)}, {res})")
-        print("------------------------------------------")
+    #         print(f"{i}: ({q.op}, {fmt(q.left_op)}, {fmt(q.right_op)}, {res})")
+    #     print("------------------------------------------")
 
 
 
